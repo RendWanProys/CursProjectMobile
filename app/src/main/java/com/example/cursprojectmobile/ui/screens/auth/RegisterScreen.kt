@@ -193,15 +193,21 @@ fun RegisterScreen(
                     isLoading = true
                     auth.createUserWithEmailAndPassword(email.trim(), password)
                         .addOnCompleteListener { task ->
-                            isLoading = false
                             if (task.isSuccessful) {
                                 val user = auth.currentUser
                                 val profileUpdates = UserProfileChangeRequest.Builder()
                                     .setDisplayName(fullName.trim())
                                     .build()
                                 user?.updateProfile(profileUpdates)
-                                onRegisterSuccess()
+                                    ?.addOnCompleteListener {
+                                        isLoading = false
+                                        onRegisterSuccess()
+                                    } ?: run {
+                                    isLoading = false
+                                    onRegisterSuccess()
+                                }
                             } else {
+                                isLoading = false
                                 Toast.makeText(
                                     context,
                                     task.exception?.localizedMessage ?: "Registration failed",
