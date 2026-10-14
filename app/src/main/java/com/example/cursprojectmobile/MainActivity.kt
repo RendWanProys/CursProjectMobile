@@ -3,45 +3,59 @@ package com.example.cursprojectmobile
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.example.cursprojectmobile.ui.screens.OnboardingScreen
+import com.example.cursprojectmobile.ui.screens.splash.SplashScreen
 import com.example.cursprojectmobile.ui.theme.CursProjectMobileTheme
+import com.example.cursprojectmobile.ui.screens.auth.RegisterScreen
+import com.example.cursprojectmobile.ui.screens.auth.LoginScreen
+
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             CursProjectMobileTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppRoot()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppRoot() {
+    var currentScreen by remember { mutableStateOf("splash") }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CursProjectMobileTheme {
-        Greeting("Android")
+    when (currentScreen) {
+        "splash" -> {
+            SplashScreen(
+                onNavigateNext = { currentScreen = "onboarding" }
+            )
+        }
+        "onboarding" -> {
+            OnboardingScreen(
+                onFinishOnboarding = { currentScreen = "register" }
+            )
+        }
+        "register" -> {
+            RegisterScreen(
+                onNavigateToLogin = { currentScreen = "login" },
+                onRegisterSuccess = { currentScreen = "home" }
+            )
+        }
+        "login" -> {
+            LoginScreen(
+                onNavigateToRegister = { currentScreen = "register" },
+                onLoginSuccess = { currentScreen = "home" }
+            )
+        }
+        "home" -> {
+            // Главный экран
+        }
     }
 }

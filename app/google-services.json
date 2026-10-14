@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "105434393659",
+    "project_id": "cursmobile-744e8",
+    "storage_bucket": "cursmobile-744e8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105434393659:android:b606dd0ab38c5573f1801e",
+        "android_client_info": {
+          "package_name": "Rg.CursProjectMobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBchS0AbCRQXMA8U_PbbYuEqAYWCIYe4qg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
