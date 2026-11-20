@@ -31,7 +31,8 @@ fun BottomNavBar(
             .fillMaxWidth()
             .shadow(16.dp, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
             .background(Color.White, shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
-            .padding(horizontal = 20.dp, vertical = 12.dp),
+            .navigationBarsPadding()
+            .padding(horizontal = 20.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
