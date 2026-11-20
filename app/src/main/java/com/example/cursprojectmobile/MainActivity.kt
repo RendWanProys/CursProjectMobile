@@ -3,214 +3,254 @@ package com.example.cursprojectmobile
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import com.example.cursprojectmobile.data.db.CartDao
-import com.example.cursprojectmobile.data.db.DatabaseHelper
-import com.example.cursprojectmobile.data.db.FoodDao
-import com.example.cursprojectmobile.data.db.OrderDao
-import com.example.cursprojectmobile.data.db.UserDao
-import com.example.cursprojectmobile.data.repository.CartRepository
-import com.example.cursprojectmobile.data.repository.FoodRepository
-import com.example.cursprojectmobile.data.repository.OrderRepository
-import com.example.cursprojectmobile.data.repository.UserRepository
-import com.example.cursprojectmobile.ui.components.BottomNavBar
-import com.example.cursprojectmobile.ui.screens.OnboardingScreen
-import com.example.cursprojectmobile.ui.screens.auth.LoginScreen
-import com.example.cursprojectmobile.ui.screens.auth.RegisterScreen
-import com.example.cursprojectmobile.ui.screens.cart.CartScreen
-import com.example.cursprojectmobile.ui.screens.chat.ChatScreen
-import com.example.cursprojectmobile.ui.screens.detail.FoodDetailScreen
-import com.example.cursprojectmobile.ui.screens.home.ExploreMenuScreen
-import com.example.cursprojectmobile.ui.screens.location.SetLocationScreen
-import com.example.cursprojectmobile.ui.screens.order.FinishOrderScreen
-import com.example.cursprojectmobile.ui.screens.profile.ProfileScreen
-import com.example.cursprojectmobile.ui.screens.splash.SplashScreen
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.cursprojectmobile.presentation.auth.AuthViewModel
+import com.example.cursprojectmobile.presentation.auth.LoginScreen
+import com.example.cursprojectmobile.presentation.auth.SignUpScreen
+import com.example.cursprojectmobile.presentation.cart.CartScreen
+import com.example.cursprojectmobile.presentation.cart.CartViewModel
+import com.example.cursprojectmobile.presentation.chat.ChatScreen
+import com.example.cursprojectmobile.presentation.chat.ChatViewModel
+import com.example.cursprojectmobile.presentation.detail.DetailViewModel
+import com.example.cursprojectmobile.presentation.detail.FoodDetailScreen
+import com.example.cursprojectmobile.presentation.home.ExploreMenuScreen
+import com.example.cursprojectmobile.presentation.home.HomeViewModel
+import com.example.cursprojectmobile.presentation.location.LocationViewModel
+import com.example.cursprojectmobile.presentation.location.SetLocationScreen
+import com.example.cursprojectmobile.presentation.onboarding.OnboardingViewModel
+import com.example.cursprojectmobile.presentation.onboarding.SplashScreen
+import com.example.cursprojectmobile.presentation.onboarding.WelcomeScreen
+import com.example.cursprojectmobile.presentation.order.FinishOrderScreen
+import com.example.cursprojectmobile.presentation.order.OrderViewModel
+import com.example.cursprojectmobile.presentation.profile.ProfileScreen
+import com.example.cursprojectmobile.presentation.profile.ProfileViewModel
 import com.example.cursprojectmobile.ui.theme.CursProjectMobileTheme
-import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             CursProjectMobileTheme {
-                AppRoot()
+                FoodCouriersNavigation()
             }
         }
     }
 }
 
 @Composable
-fun AppRoot() {
-    val context = LocalContext.current
+fun FoodCouriersNavigation() {
+    val navController = rememberNavController()
 
-    // Инициализация базы данных SQLite и репозиториев
-    val dbHelper = remember { DatabaseHelper(context.applicationContext) }
-    val foodDao = remember { FoodDao(dbHelper) }
-    val cartDao = remember { CartDao(dbHelper) }
-    val orderDao = remember { OrderDao(dbHelper) }
-    val userDao = remember { UserDao(dbHelper) }
+    val onboardingViewModel: OnboardingViewModel = viewModel()
+    val authViewModel: AuthViewModel = viewModel()
+    val homeViewModel: HomeViewModel = viewModel()
+    val cartViewModel: CartViewModel = viewModel()
+    val orderViewModel: OrderViewModel = viewModel()
+    val locationViewModel: LocationViewModel = viewModel()
+    val profileViewModel: ProfileViewModel = viewModel()
+    val chatViewModel: ChatViewModel = viewModel()
+    val detailViewModel: DetailViewModel = viewModel()
 
-    val foodRepository = remember { FoodRepository(foodDao) }
-    val cartRepository = remember { CartRepository(cartDao) }
-    val orderRepository = remember { OrderRepository(orderDao) }
-    val userRepository = remember { UserRepository(userDao) }
-
-    // Состояния приложения
-    var currentScreen by remember { mutableStateOf("splash") }
-    var selectedBottomTab by remember { mutableIntStateOf(0) }
-    var selectedFoodId by remember { mutableLongStateOf(0L) }
-    var completedOrderId by remember { mutableLongStateOf(0L) }
-    var currentAddress by remember {
-        mutableStateOf("109, Freedom Way, Off Lekki Phase Victoria Island, Lagos.")
-    }
-    var cartCount by remember { mutableIntStateOf(cartRepository.getCartCount()) }
-
-    fun updateCartBadge() {
-        cartCount = cartRepository.getCartCount()
-    }
-
-    when (currentScreen) {
-        "splash" -> {
+    NavHost(
+        navController = navController,
+        startDestination = "splash"
+    ) {
+        composable("splash") {
             SplashScreen(
-                onNavigateNext = {
-                    val user = FirebaseAuth.getInstance().currentUser
-                    currentScreen = if (user != null) "main" else "onboarding"
-                }
-            )
-        }
-        "onboarding" -> {
-            OnboardingScreen(
-                onFinishOnboarding = { currentScreen = "register" }
-            )
-        }
-        "register" -> {
-            RegisterScreen(
-                onNavigateToLogin = { currentScreen = "login" },
-                onRegisterSuccess = {
-                    updateCartBadge()
-                    currentScreen = "main"
-                }
-            )
-        }
-        "login" -> {
-            LoginScreen(
-                onNavigateToRegister = { currentScreen = "register" },
-                onLoginSuccess = {
-                    updateCartBadge()
-                    currentScreen = "main"
-                }
-            )
-        }
-        "food_detail" -> {
-            FoodDetailScreen(
-                foodId = selectedFoodId,
-                foodRepository = foodRepository,
-                cartRepository = cartRepository,
-                onBack = {
-                    updateCartBadge()
-                    currentScreen = "main"
+                viewModel = onboardingViewModel,
+                onNavigateToWelcome = {
+                    navController.navigate("welcome") {
+                        popUpTo("splash") { inclusive = true }
+                    }
                 },
-                onCartUpdated = { updateCartBadge() }
-            )
-        }
-        "set_location" -> {
-            SetLocationScreen(
-                currentAddress = currentAddress,
-                onBack = { currentScreen = "main" },
-                onLocationSet = { newAddress ->
-                    currentAddress = newAddress
-                }
-            )
-        }
-        "finish_order" -> {
-            FinishOrderScreen(
-                orderId = completedOrderId,
-                orderRepository = orderRepository,
-                onNavigateHome = {
-                    updateCartBadge()
-                    selectedBottomTab = 0
-                    currentScreen = "main"
-                }
-            )
-        }
-        "main" -> {
-            Scaffold(
-                bottomBar = {
-                    BottomNavBar(
-                        selectedTab = selectedBottomTab,
-                        cartItemCount = cartCount,
-                        onTabSelected = { tab ->
-                            selectedBottomTab = tab
-                            updateCartBadge()
-                        }
-                    )
-                }
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                        .background(Color(0xFFFAFAFA))
-                ) {
-                    when (selectedBottomTab) {
-                        0 -> {
-                            ExploreMenuScreen(
-                                foodRepository = foodRepository,
-                                cartRepository = cartRepository,
-                                currentAddress = currentAddress,
-                                onNavigateToFoodDetail = { foodId ->
-                                    selectedFoodId = foodId
-                                    currentScreen = "food_detail"
-                                },
-                                onNavigateToLocation = {
-                                    currentScreen = "set_location"
-                                },
-                                onNavigateToProfile = {
-                                    selectedBottomTab = 1
-                                },
-                                onCartUpdated = { updateCartBadge() }
-                            )
-                        }
-                        1 -> {
-                            ProfileScreen(
-                                userRepository = userRepository,
-                                orderRepository = orderRepository,
-                                onNavigateBack = { selectedBottomTab = 0 },
-                                onSignOut = {
-                                    FirebaseAuth.getInstance().signOut()
-                                    currentScreen = "login"
-                                }
-                            )
-                        }
-                        2 -> {
-                            CartScreen(
-                                cartRepository = cartRepository,
-                                orderRepository = orderRepository,
-                                currentAddress = currentAddress,
-                                onNavigateBack = { selectedBottomTab = 0 },
-                                onNavigateToHome = { selectedBottomTab = 0 },
-                                onOrderPlaced = { orderId ->
-                                    completedOrderId = orderId
-                                    updateCartBadge()
-                                    currentScreen = "finish_order"
-                                },
-                                onCartUpdated = { updateCartBadge() }
-                            )
-                        }
-                        3 -> {
-                            ChatScreen(
-                                onNavigateBack = { selectedBottomTab = 0 }
-                            )
-                        }
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("splash") { inclusive = true }
                     }
                 }
-            }
+            )
+        }
+
+        composable("welcome") {
+            WelcomeScreen(
+                onGetStarted = {
+                    navController.navigate("signup")
+                },
+                onSignIn = {
+                    navController.navigate("login")
+                }
+            )
+        }
+
+        composable("login") {
+            LoginScreen(
+                viewModel = authViewModel,
+                onNavigateToSignUp = {
+                    navController.navigate("signup")
+                },
+                onLoginSuccess = {
+                    homeViewModel.refreshSessionAddress()
+                    navController.navigate("home") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("signup") {
+            SignUpScreen(
+                viewModel = authViewModel,
+                onNavigateToSignIn = {
+                    navController.navigate("login") {
+                        popUpTo("signup") { inclusive = true }
+                    }
+                },
+                onSignUpSuccess = {
+                    homeViewModel.refreshSessionAddress()
+                    navController.navigate("home") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("home") {
+            ExploreMenuScreen(
+                viewModel = homeViewModel,
+                onNavigateToFoodDetail = { foodId ->
+                    navController.navigate("detail/$foodId")
+                },
+                onNavigateToLocation = {
+                    navController.navigate("location")
+                },
+                onNavigateToProfile = {
+                    navController.navigate("profile")
+                },
+                onNavigateToCart = {
+                    navController.navigate("cart")
+                },
+                onNavigateToChat = {
+                    navController.navigate("chat")
+                }
+            )
+        }
+
+        composable("detail/{foodId}") { backStackEntry ->
+            val foodId = backStackEntry.arguments?.getString("foodId")?.toLongOrNull() ?: 1L
+            FoodDetailScreen(
+                foodId = foodId,
+                viewModel = detailViewModel,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToCart = {
+                    navController.navigate("cart")
+                }
+            )
+        }
+
+        composable("cart") {
+            CartScreen(
+                viewModel = cartViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                    }
+                },
+                onNavigateToProfile = {
+                    navController.navigate("profile")
+                },
+                onNavigateToChat = {
+                    navController.navigate("chat")
+                },
+                onOrderPlaced = { orderId ->
+                    homeViewModel.refreshSessionAddress()
+                    navController.navigate("finish_order/$orderId") {
+                        popUpTo("cart") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("location") {
+            SetLocationScreen(
+                viewModel = locationViewModel,
+                onBack = {
+                    navController.popBackStack()
+                },
+                onLocationSet = { address ->
+                    authViewModel.updateAddress(address)
+                    homeViewModel.refreshSessionAddress()
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("finish_order/{orderId}") { backStackEntry ->
+            val orderId = backStackEntry.arguments?.getString("orderId")?.toLongOrNull() ?: 0L
+            FinishOrderScreen(
+                orderId = orderId,
+                viewModel = orderViewModel,
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                    }
+                }
+            )
+        }
+
+        composable("profile") {
+            val cartCount = homeViewModel.uiState.collectAsState().value.cartCount
+            ProfileScreen(
+                viewModel = profileViewModel,
+                cartItemCount = cartCount,
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                    }
+                },
+                onNavigateToCart = {
+                    navController.navigate("cart")
+                },
+                onNavigateToChat = {
+                    navController.navigate("chat")
+                },
+                onLogout = {
+                    authViewModel.logout()
+                    navController.navigate("welcome") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("chat") {
+            val cartCount = homeViewModel.uiState.collectAsState().value.cartCount
+            ChatScreen(
+                viewModel = chatViewModel,
+                cartItemCount = cartCount,
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("home") { inclusive = false }
+                    }
+                },
+                onNavigateToProfile = {
+                    navController.navigate("profile")
+                },
+                onNavigateToCart = {
+                    navController.navigate("cart")
+                }
+            )
         }
     }
 }
