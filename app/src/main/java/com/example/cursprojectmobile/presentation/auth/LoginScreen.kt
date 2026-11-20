@@ -17,6 +17,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -27,10 +28,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import Rg.CursProjectMobile.R
-
-private val PrimaryPink = Color(0xFFE91E63)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF6B6B6B)
+import com.example.cursprojectmobile.ui.theme.BrandBorderPink
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun LoginScreen(
@@ -49,6 +51,7 @@ fun LoginScreen(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Hero Graphic
         Image(
             painter = painterResource(id = R.drawable.onboarding_food2),
             contentDescription = null,
@@ -58,20 +61,51 @@ fun LoginScreen(
             contentScale = ContentScale.Fit
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        Text(
-            text = "Welcome Back",
-            fontSize = 26.sp,
-            fontWeight = FontWeight.Bold,
-            color = TextDark
+        // Center Handle pill
+        Box(
+            modifier = Modifier
+                .width(48.dp)
+                .height(5.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .background(Color(0xFFEDEDED))
         )
 
-        Text(
-            text = "Sign in to continue your food journey",
-            fontSize = 14.sp,
-            color = TextGray
-        )
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Top Navigation Tabs (Create Account | Login) matching Figma
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 40.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Create Account",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextGray,
+                modifier = Modifier.clickable { onNavigateToSignUp() }
+            )
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Login",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = BrandPrimary
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Box(
+                    modifier = Modifier
+                        .width(60.dp)
+                        .height(3.dp)
+                        .background(BrandPrimary, shape = RoundedCornerShape(2.dp))
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -80,22 +114,60 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
         ) {
+            // Success Message banner after registration
+            if (uiState.loginSuccessMessage != null) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = BrandLightPink),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, BrandBorderPink),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text(
+                        text = "✓ " + uiState.loginSuccessMessage!!,
+                        color = BrandPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+            }
+
+            Text(
+                text = "Email address",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextDark
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = uiState.loginEmail,
                 onValueChange = { viewModel.onLoginEmailChange(it) },
-                label = { Text("Email Address") },
+                placeholder = { Text("example@gmail.com", color = Color.Gray, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BrandPrimary,
+                    unfocusedBorderColor = Color(0xFFE8E8E8)
+                )
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
+            Text(
+                text = "Password",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextDark
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = uiState.loginPassword,
                 onValueChange = { viewModel.onLoginPasswordChange(it) },
-                label = { Text("Password") },
+                placeholder = { Text("•••• •••• ••••", color = Color.Gray, fontSize = 14.sp) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (uiState.isLoginPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -103,12 +175,17 @@ fun LoginScreen(
                     IconButton(onClick = { viewModel.toggleLoginPasswordVisibility() }) {
                         Icon(
                             imageVector = if (uiState.isLoginPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                            contentDescription = "Toggle password visibility"
+                            contentDescription = "Toggle password visibility",
+                            tint = Color.Gray
                         )
                     }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BrandPrimary,
+                    unfocusedBorderColor = Color(0xFFE8E8E8)
+                )
             )
 
             if (uiState.loginError != null) {
@@ -120,15 +197,16 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
+            // Sign In Button
             Button(
                 onClick = { viewModel.login(onSuccess = onLoginSuccess) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(52.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink),
+                colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
                 enabled = !uiState.isLoginLoading
             ) {
                 if (uiState.isLoginLoading) {
@@ -139,7 +217,7 @@ fun LoginScreen(
                     )
                 } else {
                     Text(
-                        text = "Sign In",
+                        text = "Login",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
@@ -147,24 +225,38 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+            // Sign in with Google Button
+            Button(
+                onClick = { viewModel.loginWithGoogle(onSuccess = onLoginSuccess) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF6F6F6)),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
             ) {
-                Text(text = "Don't have an account? ", color = TextGray, fontSize = 14.sp)
-                Text(
-                    text = "Sign Up",
-                    color = PrimaryPink,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.clickable { onNavigateToSignUp() }
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_google),
+                        contentDescription = "Google Logo",
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "Sign in with Google",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
         }
     }
 }

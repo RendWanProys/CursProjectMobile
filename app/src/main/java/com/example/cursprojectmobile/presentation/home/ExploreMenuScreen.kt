@@ -30,12 +30,12 @@ import com.example.cursprojectmobile.data.model.FoodItem
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
-
-private val PrimaryRed = Color(0xFFD61355)
-private val SoftPink = Color(0xFFFFF0F3)
-private val BorderPink = Color(0xFFFFD6E0)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandBorderPink
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.BrandSecondary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun ExploreMenuScreen(
@@ -98,7 +98,7 @@ fun ExploreMenuScreen(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(20.dp))
-                        .background(SoftPink)
+                        .background(BrandLightPink)
                         .clickable { onNavigateToLocation() }
                         .padding(horizontal = 14.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -109,7 +109,7 @@ fun ExploreMenuScreen(
                         text = uiState.deliveryAddress.take(22) + if (uiState.deliveryAddress.length > 22) "..." else "",
                         fontSize = 13.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = PrimaryRed
+                        color = BrandPrimary
                     )
                 }
 
@@ -117,7 +117,7 @@ fun ExploreMenuScreen(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(SoftPink)
+                        .background(BrandLightPink)
                         .clickable { onNavigateToProfile() },
                     contentAlignment = Alignment.Center
                 ) {
@@ -167,7 +167,7 @@ fun ExploreMenuScreen(
                             },
                             shape = RoundedCornerShape(16.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = PrimaryRed,
+                                focusedBorderColor = BrandPrimary,
                                 unfocusedBorderColor = Color(0xFFF0F0F0)
                             ),
                             singleLine = true,
@@ -240,8 +240,8 @@ fun ExploreMenuScreen(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(20.dp))
-                                    .background(if (isSelected) PrimaryRed else Color.White)
-                                    .border(1.dp, if (isSelected) PrimaryRed else Color(0xFFEBEBEB), RoundedCornerShape(20.dp))
+                                    .background(if (isSelected) BrandPrimary else Color.White)
+                                    .border(1.dp, if (isSelected) BrandPrimary else Color(0xFFEBEBEB), RoundedCornerShape(20.dp))
                                     .clickable { viewModel.selectCategory(category.name) }
                                     .padding(horizontal = 16.dp, vertical = 10.dp)
                             ) {
@@ -366,7 +366,7 @@ private fun FoodListItemCard(
                         text = "$${"%.2f".format(food.price)}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = PrimaryRed
+                        color = BrandPrimary
                     )
                 }
             }
@@ -375,7 +375,7 @@ private fun FoodListItemCard(
                 modifier = Modifier
                     .size(38.dp)
                     .clip(CircleShape)
-                    .background(PrimaryRed)
+                    .background(BrandPrimary)
                     .clickable { onAddToCart() },
                 contentAlignment = Alignment.Center
             ) {

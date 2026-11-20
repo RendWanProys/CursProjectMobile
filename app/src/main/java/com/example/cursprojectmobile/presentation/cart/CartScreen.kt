@@ -25,11 +25,10 @@ import com.example.cursprojectmobile.data.model.CartItem
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
-
-private val PrimaryRed = Color(0xFFD61355)
-private val SoftPink = Color(0xFFFFF0F3)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun CartScreen(
@@ -124,7 +123,7 @@ fun CartScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                         Button(
                             onClick = { onNavigateToHome() },
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed),
+                            colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             Text(text = "Explore Menu", color = Color.White)
@@ -180,8 +179,8 @@ fun CartScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Discount", color = PrimaryRed, fontSize = 14.sp)
-                                Text("-$${"%.2f".format(uiState.discount)}", fontWeight = FontWeight.SemiBold, color = PrimaryRed, fontSize = 14.sp)
+                                Text("Discount", color = BrandPrimary, fontSize = 14.sp)
+                                Text("-$${"%.2f".format(uiState.discount)}", fontWeight = FontWeight.SemiBold, color = BrandPrimary, fontSize = 14.sp)
                             }
                         }
                         HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), color = Color(0xFFEEEEEE))
@@ -191,7 +190,7 @@ fun CartScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text("Total", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = TextDark)
-                            Text("$${"%.2f".format(uiState.total)}", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = PrimaryRed)
+                            Text("$${"%.2f".format(uiState.total)}", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = BrandPrimary)
                         }
                     }
                 }
@@ -209,7 +208,7 @@ fun CartScreen(
                         .padding(horizontal = 20.dp, vertical = 8.dp)
                         .height(50.dp),
                     shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
                 ) {
                     Text(
                         text = "Place My Order",
@@ -263,7 +262,7 @@ private fun CartItemRow(
                 Text(
                     text = "$${"%.2f".format(item.foodItem.price)}",
                     fontWeight = FontWeight.ExtraBold,
-                    color = PrimaryRed,
+                    color = BrandPrimary,
                     fontSize = 15.sp
                 )
             }
@@ -302,7 +301,7 @@ private fun CartItemRow(
                     modifier = Modifier
                         .size(28.dp)
                         .clip(CircleShape)
-                        .background(PrimaryRed)
+                        .background(BrandPrimary)
                         .clickable { onIncrement() },
                     contentAlignment = Alignment.Center
                 ) {

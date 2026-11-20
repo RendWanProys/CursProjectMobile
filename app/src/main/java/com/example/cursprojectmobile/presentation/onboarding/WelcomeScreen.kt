@@ -25,6 +25,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import Rg.CursProjectMobile.R
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.DotInactive
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 import kotlinx.coroutines.launch
 
 data class WelcomePageData(
@@ -32,11 +36,6 @@ data class WelcomePageData(
     val title: String,
     val description: String
 )
-
-private val PrimaryPink = Color(0xFFE91E63)
-private val DotInactive = Color(0xFFE0E0E0)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF6B6B6B)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -117,8 +116,9 @@ fun WelcomeScreen(
                     lineHeight = 20.sp
                 )
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(32.dp))
 
+                // Center Action Button
                 Button(
                     onClick = {
                         if (pagerState.currentPage < pages.size - 1) {
@@ -133,7 +133,7 @@ fun WelcomeScreen(
                         .fillMaxWidth(0.65f)
                         .height(48.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryPink)
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
                 ) {
                     Text(
                         text = if (pagerState.currentPage < pages.size - 1) "Next" else "Get Started",
@@ -145,7 +145,7 @@ fun WelcomeScreen(
             }
         }
 
-        // Bottom row with Skip, Indicator dots, and Sign In
+        // Bottom row: Always visible on ALL pages (Page 0 and Page 1)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -153,33 +153,66 @@ fun WelcomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Left: Skip
             Text(
                 text = "Skip",
                 fontSize = 15.sp,
                 color = TextDark,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.clickable { onGetStarted() }
+                modifier = Modifier
+                    .clickable { onGetStarted() }
+                    .padding(8.dp)
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            // Center: Pager Indicator Dots (rendered on both pages!)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 repeat(pages.size) { index ->
                     val isSelected = pagerState.currentPage == index
                     Box(
                         modifier = Modifier
-                            .size(if (isSelected) 8.dp else 6.dp)
+                            .size(if (isSelected) 9.dp else 7.dp)
                             .clip(CircleShape)
-                            .background(if (isSelected) PrimaryPink else DotInactive)
+                            .background(if (isSelected) BrandPrimary else DotInactive)
+                            .clickable {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            }
                     )
                 }
             }
 
-            Text(
-                text = "Sign In",
-                fontSize = 15.sp,
-                color = PrimaryPink,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable { onSignIn() }
-            )
+            // Right: Navigation action
+            if (pagerState.currentPage < pages.size - 1) {
+                // Page 0: Arrow (→)
+                Text(
+                    text = "→",
+                    fontSize = 24.sp,
+                    color = BrandPrimary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clickable {
+                            coroutineScope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        }
+                        .padding(8.dp)
+                )
+            } else {
+                // Page 1: Sign In
+                Text(
+                    text = "Sign In",
+                    fontSize = 15.sp,
+                    color = BrandPrimary,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .clickable { onSignIn() }
+                        .padding(8.dp)
+                )
+            }
         }
     }
 }

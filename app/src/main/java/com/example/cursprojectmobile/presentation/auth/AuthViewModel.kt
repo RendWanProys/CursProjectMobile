@@ -17,15 +17,13 @@ data class AuthUiState(
     val isLoginPasswordVisible: Boolean = false,
     val isLoginLoading: Boolean = false,
     val loginError: String? = null,
+    val loginSuccessMessage: String? = null,
 
     // Sign Up form
+    val fullName: String = "",
     val signUpEmail: String = "",
     val signUpPassword: String = "",
-    val signUpConfirmPassword: String = "",
     val isSignUpPasswordVisible: Boolean = false,
-    val fullName: String = "",
-    val userName: String = "",
-    val phone: String = "",
     val isSignUpLoading: Boolean = false,
     val signUpError: String? = null,
 
@@ -47,12 +45,13 @@ class AuthViewModel(
         }
     }
 
+    // --- Login Handlers ---
     fun onLoginEmailChange(email: String) {
-        _uiState.update { it.copy(loginEmail = email, loginError = null) }
+        _uiState.update { it.copy(loginEmail = email, loginError = null, loginSuccessMessage = null) }
     }
 
     fun onLoginPasswordChange(password: String) {
-        _uiState.update { it.copy(loginPassword = password, loginError = null) }
+        _uiState.update { it.copy(loginPassword = password, loginError = null, loginSuccessMessage = null) }
     }
 
     fun toggleLoginPasswordVisibility() {
@@ -65,11 +64,11 @@ class AuthViewModel(
         val password = state.loginPassword.trim()
 
         if (email.isEmpty()) {
-            _uiState.update { it.copy(loginError = "Please enter email address") }
+            _uiState.update { it.copy(loginError = "Please enter your email address") }
             return
         }
         if (password.isEmpty()) {
-            _uiState.update { it.copy(loginError = "Please enter password") }
+            _uiState.update { it.copy(loginError = "Please enter your password") }
             return
         }
 
@@ -81,10 +80,15 @@ class AuthViewModel(
                 _uiState.update { it.copy(isLoginLoading = false, currentUser = user, loginError = null) }
                 onSuccess()
             } else {
-                val errorMsg = result.exceptionOrNull()?.message ?: "Login failed"
+                val errorMsg = result.exceptionOrNull()?.message ?: "Invalid email or password"
                 _uiState.update { it.copy(isLoginLoading = false, loginError = errorMsg) }
             }
         }
+    }
+
+    // --- Sign Up Handlers ---
+    fun onFullNameChange(name: String) {
+        _uiState.update { it.copy(fullName = name, signUpError = null) }
     }
 
     fun onSignUpEmailChange(email: String) {
@@ -95,42 +99,26 @@ class AuthViewModel(
         _uiState.update { it.copy(signUpPassword = password, signUpError = null) }
     }
 
-    fun onSignUpConfirmPasswordChange(confirm: String) {
-        _uiState.update { it.copy(signUpConfirmPassword = confirm, signUpError = null) }
-    }
-
-    fun onFullNameChange(name: String) {
-        _uiState.update { it.copy(fullName = name, signUpError = null) }
-    }
-
-    fun onUserNameChange(userName: String) {
-        _uiState.update { it.copy(userName = userName, signUpError = null) }
-    }
-
-    fun onPhoneChange(phone: String) {
-        _uiState.update { it.copy(phone = phone, signUpError = null) }
-    }
-
     fun toggleSignUpPasswordVisibility() {
         _uiState.update { it.copy(isSignUpPasswordVisible = !it.isSignUpPasswordVisible) }
     }
 
     fun register(onSuccess: () -> Unit) {
         val state = _uiState.value
+        val name = state.fullName.trim()
         val email = state.signUpEmail.trim()
         val password = state.signUpPassword.trim()
-        val confirm = state.signUpConfirmPassword.trim()
 
-        if (email.isEmpty()) {
-            _uiState.update { it.copy(signUpError = "Please enter email address") }
+        if (name.isEmpty()) {
+            _uiState.update { it.copy(signUpError = "Please enter your full name") }
+            return
+        }
+        if (email.isEmpty() || !email.contains("@")) {
+            _uiState.update { it.copy(signUpError = "Please enter a valid email address") }
             return
         }
         if (password.length < 6) {
             _uiState.update { it.copy(signUpError = "Password must be at least 6 characters") }
-            return
-        }
-        if (confirm.isNotEmpty() && password != confirm) {
-            _uiState.update { it.copy(signUpError = "Passwords do not match") }
             return
         }
 
@@ -139,17 +127,45 @@ class AuthViewModel(
             val result = repository.register(
                 email = email,
                 password = password,
-                userName = state.userName,
-                fullName = state.fullName,
-                phone = state.phone
+                fullName = name
             )
             if (result.isSuccess) {
                 val user = result.getOrNull()
-                _uiState.update { it.copy(isSignUpLoading = false, currentUser = user, signUpError = null) }
+                _uiState.update {
+                    it.copy(
+                        isSignUpLoading = false,
+                        currentUser = user,
+                        loginEmail = email,
+                        loginPassword = password,
+                        loginSuccessMessage = "Account created! You can now sign in.",
+                        signUpError = null
+                    )
+                }
                 onSuccess()
             } else {
                 val errorMsg = result.exceptionOrNull()?.message ?: "Registration failed"
                 _uiState.update { it.copy(isSignUpLoading = false, signUpError = errorMsg) }
+            }
+        }
+    }
+
+    // --- Google Sign-In Handler ---
+    fun loginWithGoogle(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoginLoading = true, isSignUpLoading = true) }
+            val result = repository.loginWithGoogle()
+            if (result.isSuccess) {
+                val user = result.getOrNull()
+                _uiState.update {
+                    it.copy(
+                        isLoginLoading = false,
+                        isSignUpLoading = false,
+                        currentUser = user,
+                        loginError = null,
+                        signUpError = null
+                    )
+                }
+                onSuccess()
             }
         }
     }

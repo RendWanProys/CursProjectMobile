@@ -15,10 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-private val BrandPrimary = Color(0xFFD61355)
-private val BrandLightPink = Color(0xFFFFF0F3)
-private val BrandInactive = Color(0xFFFF94B2)
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
 
 @Composable
 fun BottomNavBar(

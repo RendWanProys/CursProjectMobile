@@ -22,10 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
-
-private val PrimaryRed = Color(0xFFD61355)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun FinishOrderScreen(
@@ -162,7 +161,7 @@ fun FinishOrderScreen(
                 .fillMaxWidth()
                 .height(50.dp),
             shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)
+            colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
         ) {
             Text(
                 text = "Submit & Return Home",

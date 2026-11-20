@@ -22,11 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.domain.model.ChatMessage
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
-
-private val PrimaryRed = Color(0xFFD61355)
-private val SoftPink = Color(0xFFFFF0F3)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun ChatScreen(
@@ -73,7 +72,7 @@ fun ChatScreen(
                     modifier = Modifier
                         .size(44.dp)
                         .clip(CircleShape)
-                        .background(SoftPink),
+                        .background(BrandLightPink),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(text = "🎧", fontSize = 22.sp)
@@ -142,7 +141,7 @@ fun ChatScreen(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(CircleShape)
-                            .background(PrimaryRed)
+                            .background(BrandPrimary)
                     ) {
                         Text(text = "➤", color = Color.White, fontSize = 18.sp)
                     }
@@ -170,7 +169,7 @@ private fun ChatMessageBubble(message: ChatMessage) {
                         bottomEnd = if (isUser) 4.dp else 16.dp
                     )
                 )
-                .background(if (isUser) PrimaryRed else Color.White)
+                .background(if (isUser) BrandPrimary else Color.White)
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
             Column {

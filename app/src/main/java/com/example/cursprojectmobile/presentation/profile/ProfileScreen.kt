@@ -22,11 +22,10 @@ import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
-
-private val PrimaryRed = Color(0xFFD61355)
-private val SoftPink = Color(0xFFFFF0F3)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun ProfileScreen(
@@ -86,7 +85,7 @@ fun ProfileScreen(
                     text = if (uiState.isEditMode) "Save" else "Edit",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = PrimaryRed,
+                    color = BrandPrimary,
                     modifier = Modifier.clickable {
                         if (uiState.isEditMode) {
                             viewModel.saveProfile()
@@ -235,7 +234,7 @@ fun ProfileScreen(
                                     text = "$${"%.2f".format(order.totalAmount)}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
-                                    color = PrimaryRed
+                                    color = BrandPrimary
                                 )
                             }
                         }
@@ -255,7 +254,7 @@ fun ProfileScreen(
                     ) {
                         Text(
                             text = "Sign Out",
-                            color = PrimaryRed,
+                            color = BrandPrimary,
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold
                         )

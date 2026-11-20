@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.BrandSecondary
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -41,8 +43,8 @@ fun SplashScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFE91E63),
-                        Color(0xFFFF4081)
+                        BrandPrimary,
+                        BrandSecondary
                     )
                 )
             ),
@@ -78,7 +80,7 @@ fun SplashScreen(
 
             Text(
                 text = uiState.splashSubtitle,
-                color = Color.White.copy(alpha = 0.85f),
+                color = Color.White.copy(alpha = 0.88f),
                 fontSize = 15.sp
             )
         }

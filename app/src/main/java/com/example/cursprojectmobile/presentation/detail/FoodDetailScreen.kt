@@ -23,10 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
-
-private val PrimaryRed = Color(0xFFD61355)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun FoodDetailScreen(
@@ -50,7 +49,7 @@ fun FoodDetailScreen(
                 .background(Color.White),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = PrimaryRed)
+            CircularProgressIndicator(color = BrandPrimary)
         }
         return
     }
@@ -157,7 +156,7 @@ fun FoodDetailScreen(
                     text = "$${"%.2f".format(food.price)}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = PrimaryRed
+                    color = BrandPrimary
                 )
             }
 
@@ -276,7 +275,7 @@ fun FoodDetailScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(PrimaryRed)
+                            .background(BrandPrimary)
                             .clickable { viewModel.incrementQuantity() },
                         contentAlignment = Alignment.Center
                     ) {
@@ -297,7 +296,7 @@ fun FoodDetailScreen(
                         .padding(start = 16.dp)
                         .height(48.dp),
                     shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
                 ) {
                     Text(
                         text = "Add to Cart • $${"%.2f".format(food.price * uiState.quantity)}",

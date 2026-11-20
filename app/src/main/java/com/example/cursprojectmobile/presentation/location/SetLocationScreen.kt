@@ -21,11 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
-
-private val PrimaryRed = Color(0xFFD61355)
-private val SoftPink = Color(0xFFFFF0F3)
-private val TextDark = Color(0xFF1F1F1F)
-private val TextGray = Color(0xFF757575)
+import com.example.cursprojectmobile.ui.theme.BrandLightPink
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextDark
+import com.example.cursprojectmobile.ui.theme.TextGray
 
 @Composable
 fun SetLocationScreen(
@@ -99,7 +98,7 @@ fun SetLocationScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(PrimaryRed),
+                        .background(BrandPrimary),
                     contentAlignment = Alignment.Center
                 ) {
                     Text("📍", fontSize = 24.sp)
@@ -143,8 +142,8 @@ fun SetLocationScreen(
                         .fillMaxWidth()
                         .clickable { viewModel.selectAddress(address) },
                     shape = RoundedCornerShape(14.dp),
-                    colors = CardDefaults.cardColors(containerColor = if (isSelected) SoftPink else Color(0xFFF9F9F9)),
-                    border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, PrimaryRed) else null
+                    colors = CardDefaults.cardColors(containerColor = if (isSelected) BrandLightPink else Color(0xFFF9F9F9)),
+                    border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, BrandPrimary) else null
                 ) {
                     Row(
                         modifier = Modifier
@@ -179,7 +178,7 @@ fun SetLocationScreen(
                 .padding(20.dp)
                 .height(50.dp),
             shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)
+            colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
         ) {
             Text(
                 text = "Confirm Location",

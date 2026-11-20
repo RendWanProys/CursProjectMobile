@@ -113,9 +113,8 @@ fun FoodCouriersNavigation() {
                     }
                 },
                 onSignUpSuccess = {
-                    homeViewModel.refreshSessionAddress()
-                    navController.navigate("home") {
-                        popUpTo("welcome") { inclusive = true }
+                    navController.navigate("login") {
+                        popUpTo("signup") { inclusive = true }
                     }
                 }
             )
