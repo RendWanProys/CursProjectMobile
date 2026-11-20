@@ -36,7 +36,8 @@ import com.example.cursprojectmobile.ui.theme.TextGray
 fun SignUpScreen(
     viewModel: AuthViewModel,
     onNavigateToSignIn: () -> Unit,
-    onSignUpSuccess: () -> Unit
+    onSignUpSuccess: () -> Unit,
+    onGoogleSignUpSuccess: () -> Unit = onSignUpSuccess
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -229,7 +230,7 @@ fun SignUpScreen(
 
             // Sign Up with Google Button
             Button(
-                onClick = { viewModel.loginWithGoogle(onSuccess = onSignUpSuccess) },
+                onClick = { viewModel.loginWithGoogle(onSuccess = onGoogleSignUpSuccess) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

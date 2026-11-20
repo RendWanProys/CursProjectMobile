@@ -116,6 +116,12 @@ fun FoodCouriersNavigation() {
                     navController.navigate("login") {
                         popUpTo("signup") { inclusive = true }
                     }
+                },
+                onGoogleSignUpSuccess = {
+                    homeViewModel.refreshSessionAddress()
+                    navController.navigate("home") {
+                        popUpTo("welcome") { inclusive = true }
+                    }
                 }
             )
         }
