@@ -8,29 +8,37 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.cursprojectmobile.data.model.FoodItem
+import java.util.Locale
 import com.example.cursprojectmobile.data.repository.CartRepository
 import com.example.cursprojectmobile.data.repository.FoodRepository
-import com.example.cursprojectmobile.ui.components.FoodImagePlaceholder
-import com.example.cursprojectmobile.ui.components.FoodImages
+import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
+import com.example.cursprojectmobile.presentation.components.FoodImages
+import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.Poppins
+import com.example.cursprojectmobile.ui.theme.TextDark
 
-val PrimaryRed = Color(0xFFD61355)
-val SoftPink = Color(0xFFFFF0F3)
-val TextDark = Color(0xFF1F1F1F)
-val TextGray = Color(0xFF757575)
+private val SoftPinkBadge = Color(0xFFFDE8EC)
+private val LightGrayBadge = Color(0xFFF0F0F2)
+private val MetaGrayText = Color(0xFF8C8E98)
+private val StarGold = Color(0xFFFFB800)
 
 @Composable
 fun FoodDetailScreen(
@@ -47,7 +55,7 @@ fun FoodDetailScreen(
 
     if (food == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Food item not found", color = TextGray)
+            CircularProgressIndicator(color = BrandPrimary)
         }
         return
     }
@@ -61,63 +69,31 @@ fun FoodDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .padding(bottom = 90.dp)
         ) {
-            // --- TOP HERO IMAGE ---
+            val imageRes = FoodImages.getDrawableByName(food.imageResName) ?: FoodImages.BURGER_DETAIL
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(Color(0xFFFFC0D3), Color(0xFFFFE4EC))
-                        )
-                    )
+                    .height(310.dp)
             ) {
                 FoodImagePlaceholder(
-                    drawableRes = FoodImages.getDrawableByName(food.imageResName) ?: FoodImages.BURGER_DETAIL,
+                    drawableRes = imageRes,
                     emoji = if (food.category == "Pizza") "🍕" else "🍔",
                     cornerRadius = 0.dp,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    fontSize = 72.sp
+                    modifier = Modifier.fillMaxSize()
                 )
-
-                // Back Button (Top Left)
-                Box(
-                    modifier = Modifier
-                        .padding(top = 24.dp, start = 20.dp)
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(SoftPink)
-                        .clickable(onClick = onBack),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "❮", fontSize = 18.sp, color = PrimaryRed, fontWeight = FontWeight.Bold)
-                }
             }
 
-            // --- BOTTOM SHEET DETAILS ---
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(y = (-20).dp)
+                    .offset(y = (-24).dp)
                     .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
                     .background(Color.White)
-                    .padding(horizontal = 24.dp, vertical = 20.dp)
+                    .padding(horizontal = 24.dp, vertical = 22.dp)
             ) {
-                // Drag handle bar
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .width(48.dp)
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(Color(0xFFFFD6E0))
-                )
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                // Tags row: Popular, Location, Favorite
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -125,188 +101,255 @@ fun FoodDetailScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(SoftPink)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(SoftPinkBadge)
                             .padding(horizontal = 14.dp, vertical = 6.dp)
                     ) {
                         Text(
                             text = if (food.isPopular) "Popular" else food.category,
-                            color = PrimaryRed,
+                            color = BrandPrimary,
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins
                         )
                     }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Box(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(CircleShape)
-                                .background(SoftPink)
+                                .background(SoftPinkBadge)
                                 .clickable {
                                     Toast.makeText(context, "Location tagged", Toast.LENGTH_SHORT).show()
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("📍", fontSize = 16.sp)
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "Location",
+                                tint = BrandPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
 
                         Box(
                             modifier = Modifier
                                 .size(38.dp)
                                 .clip(CircleShape)
-                                .background(if (isFavorite) SoftPink else Color(0xFFF5F5F5))
-                                .clickable { isFavorite = !isFavorite },
+                                .background(if (isFavorite) SoftPinkBadge else LightGrayBadge)
+                                .clickable {
+                                    isFavorite = !isFavorite
+                                    val msg = if (isFavorite) "Added to favorites" else "Removed from favorites"
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = if (isFavorite) "❤️" else "🤍",
-                                fontSize = 16.sp
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = "Favorite",
+                                tint = if (isFavorite) BrandPrimary else Color(0xFF1E1E2E),
+                                modifier = Modifier.size(19.dp)
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
-                // Food Title
                 Text(
                     text = food.title,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
                     color = TextDark,
-                    lineHeight = 30.sp
+                    lineHeight = 32.sp
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
-                // Rating & Orders Meta
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(18.dp)
+                    horizontalArrangement = Arrangement.spacedBy(22.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("⭐", fontSize = 16.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = "Rating",
+                            tint = StarGold,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "${food.rating} Rating",
+                            text = "${food.rating.toString().replace('.', ',')} Rating",
                             fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = Poppins,
+                            color = MetaGrayText
+                        )
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingBag,
+                            contentDescription = "Orders",
+                            tint = BrandPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "${food.orderCount}+ Order",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            fontFamily = Poppins,
+                            color = MetaGrayText
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = food.description.ifEmpty {
+                        "In a medium bowl, add ground chicken, breadcrumbs, mayonnaise, onions, parsley, garlic, paprika, salt and pepper. Use your hands to combine all the ingredients together until blended, but don't over mix."
+                    },
+                    fontSize = 14.sp,
+                    fontFamily = Poppins,
+                    color = Color(0xFF333333),
+                    lineHeight = 22.sp
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(SoftPinkBadge)
+                    .clickable { onBack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Back",
+                    tint = BrandPrimary,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.94f))
+                    .clickable { onCartUpdated() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = "Cart",
+                    tint = TextDark,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Surface(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .navigationBarsPadding(),
+            shadowElevation = 10.dp,
+            color = Color.White
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFFF5F6F8))
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { if (quantity > 1) quantity-- },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "–",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
                             color = TextDark
                         )
                     }
 
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("🛍️", fontSize = 16.sp)
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "${food.orderCount}+ Orders",
-                            fontSize = 14.sp,
-                            color = TextGray
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                // Description
-                Text(
-                    text = "Description",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextDark
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = food.description.ifBlank { food.subtitle },
-                    fontSize = 14.sp,
-                    color = TextGray,
-                    lineHeight = 22.sp
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Quantity & Price Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text("Total Price", fontSize = 12.sp, color = TextGray)
-                        Text(
-                            text = "$ ${"%.2f".format(food.price * quantity)}",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = PrimaryRed
-                        )
-                    }
-
-                    // Quantity Counter (- / +)
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFFF7F7F7))
-                            .padding(horizontal = 6.dp, vertical = 4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(SoftPink)
-                                .clickable { if (quantity > 1) quantity-- },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("-", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = PrimaryRed)
-                        }
-
-                        Text(
-                            text = quantity.toString(),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 14.dp)
-                        )
-
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(PrimaryRed)
-                                .clickable { quantity++ },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("+", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Add to Cart Button
-                Button(
-                    onClick = {
-                        cartRepository.addToCart(food.id, quantity)
-                        onCartUpdated()
-                        Toast.makeText(context, "$quantity x ${food.title} added to cart!", Toast.LENGTH_SHORT).show()
-                        onBack()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(54.dp)
-                        .shadow(8.dp, RoundedCornerShape(16.dp)),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryRed)
-                ) {
                     Text(
-                        text = "Add To Cart",
+                        text = "$quantity",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        fontFamily = Poppins,
+                        color = TextDark
                     )
+
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(BrandPrimary)
+                            .clickable { quantity++ },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                val totalPrice = food.price * quantity
+                Button(
+                    onClick = {
+                        cartRepository.addToCart(food, quantity)
+                        onCartUpdated()
+                        Toast.makeText(context, "${food.title} added to cart", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
+                ) {
+                    Text(
+                        text = "Add to Cart • $${String.format(Locale.US, "%.2f", totalPrice)}",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Poppins
+                    )
+                }
             }
         }
     }

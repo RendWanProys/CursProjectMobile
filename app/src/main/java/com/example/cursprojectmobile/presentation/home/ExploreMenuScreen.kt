@@ -221,8 +221,9 @@ fun ExploreMenuScreen(
             } else {
                 // 3. Special Offer Banner (Ready-made graphic banner with click to burger detail)
                 item {
-                    val burgerId = uiState.popularFoods.firstOrNull { it.category == "Burger" }?.id
-                        ?: uiState.filteredFoods.firstOrNull { it.category == "Burger" }?.id
+                    val burgerId = uiState.popularFoods.firstOrNull { it.title.contains("Promo Pack", ignoreCase = true) }?.id
+                        ?: uiState.filteredFoods.firstOrNull { it.title.contains("Promo Pack", ignoreCase = true) }?.id
+                        ?: uiState.popularFoods.firstOrNull { it.category == "Burger" }?.id
                         ?: 1L
 
                     Spacer(modifier = Modifier.height(10.dp))
