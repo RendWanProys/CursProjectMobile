@@ -1,29 +1,34 @@
 package com.example.cursprojectmobile.presentation.chat
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import Rg.CursProjectMobile.R
 import com.example.cursprojectmobile.domain.model.ChatMessage
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.ui.theme.BrandLightPink
 import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.Poppins
 import com.example.cursprojectmobile.ui.theme.TextDark
 import com.example.cursprojectmobile.ui.theme.TextGray
 
@@ -36,6 +41,15 @@ fun ChatScreen(
     onNavigateToCart: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+
+    // Auto-scroll to bottom when new messages arrive or bot is typing
+    LaunchedEffect(uiState.messages.size, uiState.isBotTyping) {
+        val totalCount = uiState.messages.size + if (uiState.isBotTyping) 1 else 0
+        if (totalCount > 0) {
+            listState.animateScrollToItem(totalCount - 1)
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -53,97 +67,170 @@ fun ChatScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFFAFAFA))
                 .statusBarsPadding()
                 .padding(innerPadding)
+                .imePadding()
         ) {
-            // Header
-            Row(
+            // Food doodle pattern in top-right background
+            Image(
+                painter = painterResource(id = R.drawable.bg_food_pattern),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .height(180.dp)
+                    .align(Alignment.TopCenter),
+                contentScale = ContentScale.Crop,
+                alpha = 0.45f
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(BrandLightPink),
-                    contentAlignment = Alignment.Center
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Top Bar with Back, Title, Notification Bell
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "🎧", fontSize = 22.sp)
-                }
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFFFDE8EC))
+                            .clickable { onNavigateToHome() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "‹",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = BrandPrimary
+                        )
+                    }
 
-                Spacer(modifier = Modifier.width(12.dp))
-
-                Column {
                     Text(
-                        text = "Food Couriers Support",
-                        fontSize = 16.sp,
+                        text = "Chat",
+                        fontSize = 26.sp,
                         fontWeight = FontWeight.Bold,
+                        fontFamily = Poppins,
                         color = TextDark
                     )
-                    Text(
-                        text = "Online • Typically replies instantly",
-                        fontSize = 12.sp,
-                        color = Color(0xFF4CAF50)
-                    )
-                }
-            }
 
-            // Message List
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                contentPadding = PaddingValues(vertical = 12.dp)
-            ) {
-                items(uiState.messages) { message ->
-                    ChatMessageBubble(message = message)
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFFFDE8EC)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "🔔", fontSize = 18.sp)
+                    }
                 }
-            }
 
-            // Input Bar
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shadowElevation = 8.dp,
-                color = Color.White
-            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Chat Messages LazyColumn
+                LazyColumn(
+                    state = listState,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    items(uiState.messages, key = { it.id }) { message ->
+                        ChatMessageItem(message = message)
+                    }
+
+                    if (uiState.isBotTyping) {
+                        item {
+                            BotTypingBubble()
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Bottom Messenger Input Bar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp),
+                        .padding(bottom = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    OutlinedTextField(
-                        value = uiState.inputText,
-                        onValueChange = { viewModel.onInputTextChange(it) },
-                        placeholder = { Text("Ask support...", color = Color.Gray, fontSize = 14.sp) },
+                    // Attachment Paperclip Button
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFFFDE8EC))
+                            .clickable { },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "📎", fontSize = 20.sp)
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
+                    // Text Input Bar with Send button
+                    Surface(
                         modifier = Modifier
                             .weight(1f)
                             .height(50.dp),
                         shape = RoundedCornerShape(25.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                        keyboardActions = KeyboardActions(onSend = { viewModel.sendMessage() })
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    IconButton(
-                        onClick = { viewModel.sendMessage() },
-                        modifier = Modifier
-                            .size(46.dp)
-                            .clip(CircleShape)
-                            .background(BrandPrimary)
+                        color = Color(0xFFF6F6F6)
                     ) {
-                        Text(text = "➤", color = Color.White, fontSize = 18.sp)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = uiState.inputText,
+                                onValueChange = { viewModel.onInputTextChange(it) },
+                                placeholder = {
+                                    Text(
+                                        text = "Type a message...",
+                                        color = Color(0xFF9E9E9E),
+                                        fontSize = 14.sp,
+                                        fontFamily = Poppins
+                                    )
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent,
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent
+                                ),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                                keyboardActions = KeyboardActions(onSend = { viewModel.sendMessage() })
+                            )
+
+                            IconButton(
+                                onClick = { viewModel.sendMessage() },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Text(
+                                    text = "➤",
+                                    color = BrandPrimary,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -152,41 +239,111 @@ fun ChatScreen(
 }
 
 @Composable
-private fun ChatMessageBubble(message: ChatMessage) {
+private fun ChatMessageItem(message: ChatMessage) {
     val isUser = message.isFromUser
+    if (isUser) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 280.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 18.dp,
+                            topEnd = 4.dp,
+                            bottomStart = 18.dp,
+                            bottomEnd = 18.dp
+                        )
+                    )
+                    .background(BrandPrimary)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text = message.text,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontFamily = Poppins,
+                    lineHeight = 20.sp
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.Top
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(BrandPrimary),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "🤖", fontSize = 20.sp)
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            Box(
+                modifier = Modifier
+                    .widthIn(max = 270.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 4.dp,
+                            topEnd = 18.dp,
+                            bottomStart = 18.dp,
+                            bottomEnd = 18.dp
+                        )
+                    )
+                    .background(Color(0xFFF6F6F6))
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Text(
+                    text = message.text,
+                    color = TextDark,
+                    fontSize = 14.sp,
+                    fontFamily = Poppins,
+                    lineHeight = 20.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BotTypingBubble() {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Top
     ) {
         Box(
             modifier = Modifier
-                .widthIn(max = 280.dp)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 16.dp,
-                        topEnd = 16.dp,
-                        bottomStart = if (isUser) 16.dp else 4.dp,
-                        bottomEnd = if (isUser) 4.dp else 16.dp
-                    )
-                )
-                .background(if (isUser) BrandPrimary else Color.White)
-                .padding(horizontal = 14.dp, vertical = 10.dp)
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(BrandPrimary),
+            contentAlignment = Alignment.Center
         ) {
-            Column {
-                Text(
-                    text = message.text,
-                    color = if (isUser) Color.White else TextDark,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = message.timestamp,
-                    color = if (isUser) Color.White.copy(alpha = 0.7f) else TextGray,
-                    fontSize = 10.sp,
-                    modifier = Modifier.align(Alignment.End)
-                )
-            }
+            Text(text = "🤖", fontSize = 20.sp)
+        }
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color(0xFFF6F6F6))
+                .padding(horizontal = 16.dp, vertical = 10.dp)
+        ) {
+            Text(
+                text = "••••",
+                color = BrandPrimary,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

@@ -242,28 +242,32 @@ class AuthFirebaseRepository {
         return Result.success(googleUser)
     }
 
-    suspend fun updateProfile(user: User): Result<User> {
-        UserSessionManager.saveSession(user)
-        LocalAuthStore.currentUser = user
+    suspend fun updateProfile(user: User): Result<User> = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
         try {
-            userDao.updateUserProfile(
-                UserProfile(
-                    id = 1,
-                    name = user.fullName,
-                    email = user.email,
-                    phone = user.phone
+            UserSessionManager.saveSession(user)
+            LocalAuthStore.currentUser = user
+            try {
+                userDao.updateUserProfile(
+                    UserProfile(
+                        id = 1,
+                        name = user.fullName,
+                        email = user.email,
+                        phone = user.phone
+                    )
                 )
-            )
-        } catch (_: Exception) {}
+            } catch (_: Exception) {}
 
-        try {
-            if (user.uid.isNotEmpty()) {
-                withTimeoutOrNull(2500L) {
-                    firestore.collection("users").document(user.uid).set(user).await()
+            try {
+                if (user.uid.isNotEmpty()) {
+                    withTimeoutOrNull(2500L) {
+                        firestore.collection("users").document(user.uid).set(user).await()
+                    }
                 }
-            }
-        } catch (_: Exception) {}
-        return Result.success(user)
+            } catch (_: Exception) {}
+            Result.success(user)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     fun logout() {

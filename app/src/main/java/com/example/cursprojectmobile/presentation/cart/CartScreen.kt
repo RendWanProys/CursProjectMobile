@@ -1,6 +1,7 @@
 package com.example.cursprojectmobile.presentation.cart
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,17 +17,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import Rg.CursProjectMobile.R
 import com.example.cursprojectmobile.data.model.CartItem
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
 import com.example.cursprojectmobile.ui.theme.BrandLightPink
 import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.Poppins
 import com.example.cursprojectmobile.ui.theme.TextDark
 import com.example.cursprojectmobile.ui.theme.TextGray
 
@@ -62,160 +70,273 @@ fun CartScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFFAFAFA))
                 .statusBarsPadding()
                 .padding(innerPadding)
         ) {
-            // Header
-            Row(
+            // Food doodle pattern in top right background
+            Image(
+                painter = painterResource(id = R.drawable.bg_food_pattern),
+                contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .height(200.dp)
+                    .align(Alignment.TopCenter),
+                contentScale = ContentScale.Crop,
+                alpha = 0.45f
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 20.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .clickable { onNavigateBack() },
-                    contentAlignment = Alignment.Center
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Top Bar with Back Button
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "←", fontSize = 22.sp, color = TextDark)
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(Color(0xFFFDE8EC))
+                            .clickable { onNavigateBack() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "‹",
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = BrandPrimary
+                        )
+                    }
                 }
 
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // "Order details" header (bold Poppins, left aligned)
                 Text(
-                    text = "Order Details",
-                    fontSize = 18.sp,
+                    text = "Order details",
+                    fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
                     color = TextDark
                 )
 
-                Spacer(modifier = Modifier.size(44.dp))
-            }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            if (uiState.cartItems.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "🛒", fontSize = 64.sp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Your Cart is Empty",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = TextDark
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Looks like you haven't added anything to your cart yet",
-                            fontSize = 14.sp,
-                            color = TextGray
-                        )
-                        Spacer(modifier = Modifier.height(24.dp))
-                        Button(
-                            onClick = { onNavigateToHome() },
-                            colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
-                            Text(text = "Explore Menu", color = Color.White)
+                if (uiState.cartItems.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = "🛒", fontSize = 64.sp)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Your Cart is Empty",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = Poppins,
+                                color = TextDark
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Looks like you haven't added anything to your cart yet",
+                                fontSize = 14.sp,
+                                fontFamily = Poppins,
+                                color = TextGray
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+                            Button(
+                                onClick = { onNavigateToHome() },
+                                colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = "Explore Menu",
+                                    color = Color.White,
+                                    fontFamily = Poppins
+                                )
+                            }
                         }
                     }
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 20.dp),
-                    contentPadding = PaddingValues(vertical = 12.dp)
-                ) {
-                    items(uiState.cartItems) { item ->
-                        CartItemRow(
-                            item = item,
-                            onIncrement = { viewModel.incrementItem(item.id) },
-                            onDecrement = { viewModel.decrementItem(item.id) },
-                            onDelete = { viewModel.removeItem(item.id) }
-                        )
-                        Spacer(modifier = Modifier.height(10.dp))
+                } else {
+                    // List of items
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        contentPadding = PaddingValues(vertical = 8.dp)
+                    ) {
+                        items(uiState.cartItems, key = { it.id }) { item ->
+                            CartItemRow(
+                                item = item,
+                                onIncrement = { viewModel.incrementItem(item.id) },
+                                onDecrement = { viewModel.decrementItem(item.id) },
+                                onDelete = { viewModel.removeItem(item.id) }
+                            )
+                        }
                     }
-                }
 
-                // Pricing Summary Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Bottom Red Summary Card matching Mockup 1.31
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(22.dp))
+                            .background(
+                                Brush.horizontalGradient(
+                                    listOf(BrandPrimary, Color(0xFFFF2E63))
+                                )
+                            )
+                            .shadow(8.dp, RoundedCornerShape(22.dp))
+                    ) {
+                        // Food doodle overlay inside the red card
+                        Image(
+                            painter = painterResource(id = R.drawable.bg_food_pattern),
+                            contentDescription = null,
+                            modifier = Modifier.matchParentSize(),
+                            contentScale = ContentScale.Crop,
+                            alpha = 0.16f,
+                            colorFilter = ColorFilter.tint(Color.White)
+                        )
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
                         ) {
-                            Text("Subtotal", color = TextGray, fontSize = 14.sp)
-                            Text("$${"%.2f".format(uiState.subtotal)}", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        }
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("Delivery Charge", color = TextGray, fontSize = 14.sp)
-                            Text("$${"%.2f".format(uiState.deliveryFee)}", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                        }
-                        if (uiState.discount > 0) {
-                            Spacer(modifier = Modifier.height(6.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Discount", color = BrandPrimary, fontSize = 14.sp)
-                                Text("-$${"%.2f".format(uiState.discount)}", fontWeight = FontWeight.SemiBold, color = BrandPrimary, fontSize = 14.sp)
+                                Text(
+                                    text = "Sub-Total",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = Poppins
+                                )
+                                Text(
+                                    text = "${uiState.subtotal.toInt()} $",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = Poppins
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Delivery Charge",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = Poppins
+                                )
+                                Text(
+                                    text = "${uiState.deliveryFee.toInt()} $",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = Poppins
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = "Discount",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    fontFamily = Poppins
+                                )
+                                Text(
+                                    text = "${uiState.discount.toInt()} $",
+                                    color = Color.White,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = Poppins
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(14.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "Total",
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = Poppins
+                                )
+                                Text(
+                                    text = "${uiState.total.toInt()}$",
+                                    color = Color.White,
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    fontFamily = Poppins
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.height(18.dp))
+
+                            // White "Place My Order" button
+                            Button(
+                                onClick = {
+                                    viewModel.placeOrder { orderId ->
+                                        Toast.makeText(
+                                            context,
+                                            "Order placed successfully!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                        onOrderPlaced(orderId)
+                                    }
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(52.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                            ) {
+                                Text(
+                                    text = "Place My Order",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    fontFamily = Poppins,
+                                    color = BrandPrimary
+                                )
                             }
                         }
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), color = Color(0xFFEEEEEE))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Total", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = TextDark)
-                            Text("$${"%.2f".format(uiState.total)}", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = BrandPrimary)
-                        }
                     }
-                }
 
-                // Place Order Button
-                Button(
-                    onClick = {
-                        viewModel.placeOrder { orderId ->
-                            Toast.makeText(context, "Order placed successfully!", Toast.LENGTH_SHORT).show()
-                            onOrderPlaced(orderId)
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 8.dp)
-                        .height(50.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
-                ) {
-                    Text(
-                        text = "Place My Order",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
         }
@@ -231,81 +352,100 @@ private fun CartItemRow(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val drawableId = FoodImages.getDrawableByName(item.foodItem.imageResName)
+            val food = item.foodItem
+            val imageRes = FoodImages.getDrawableByName(food.imageResName)
             FoodImagePlaceholder(
-                drawableRes = drawableId,
-                emoji = "🍔",
-                cornerRadius = 12.dp,
+                drawableRes = imageRes,
+                emoji = when (food.category) {
+                    "Pizza" -> "🍕"
+                    "Sandwich" -> "🥪"
+                    else -> "🍔"
+                },
+                cornerRadius = 14.dp,
                 modifier = Modifier.size(64.dp)
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = item.foodItem.title,
+                    text = food.title,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp,
+                    fontFamily = Poppins,
                     color = TextDark
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "$${"%.2f".format(item.foodItem.price)}",
-                    fontWeight = FontWeight.ExtraBold,
-                    color = BrandPrimary,
-                    fontSize = 15.sp
+                    text = food.subtitle.ifEmpty { "Burger Factory LTD" },
+                    fontSize = 13.sp,
+                    fontFamily = Poppins,
+                    color = TextGray
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "$ ${food.price.toInt()}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
+                    color = BrandPrimary
                 )
             }
 
-            // Quantity Modifier (- Qty +)
+            // Stepper with Minus [-] Qty [+]
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFF5F5F5))
-                    .padding(horizontal = 6.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(
                     modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFFDE8EC))
                         .clickable { onDecrement() },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("−", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextDark)
+                    Text(
+                        text = "−",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = BrandPrimary
+                    )
                 }
-
-                Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
                     text = "${item.quantity}",
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
-                    color = TextDark
+                    fontFamily = Poppins,
+                    color = TextDark,
+                    modifier = Modifier.padding(horizontal = 4.dp)
                 )
-
-                Spacer(modifier = Modifier.width(10.dp))
 
                 Box(
                     modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .background(BrandPrimary)
                         .clickable { onIncrement() },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("+", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(
+                        text = "+",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
         }

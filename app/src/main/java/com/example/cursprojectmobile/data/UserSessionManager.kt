@@ -37,7 +37,7 @@ object UserSessionManager {
             email = email,
             fullName = prefs.getString(KEY_FULL_NAME, "Guest User") ?: "Guest User",
             userName = prefs.getString(KEY_USER_NAME, "guest") ?: "guest",
-            phone = prefs.getString(KEY_PHONE, "+1 234 567 8900") ?: "+1 234 567 8900",
+            phone = prefs.getString(KEY_PHONE, "") ?: "",
             address = prefs.getString(KEY_ADDRESS, "4517 Washington Ave. Manchester, Kentucky 39495")
                 ?: "4517 Washington Ave. Manchester, Kentucky 39495",
             avatarPath = prefs.getString(KEY_AVATAR_PATH, "") ?: ""

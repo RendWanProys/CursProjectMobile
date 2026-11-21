@@ -20,6 +20,7 @@ import com.example.cursprojectmobile.presentation.chat.ChatViewModel
 import com.example.cursprojectmobile.presentation.detail.DetailViewModel
 import com.example.cursprojectmobile.presentation.detail.FoodDetailScreen
 import com.example.cursprojectmobile.presentation.home.ExploreMenuScreen
+import com.example.cursprojectmobile.presentation.home.MealMenuScreen
 import com.example.cursprojectmobile.presentation.home.HomeViewModel
 import com.example.cursprojectmobile.presentation.location.LocationViewModel
 import com.example.cursprojectmobile.presentation.location.SetLocationScreen
@@ -132,8 +133,32 @@ fun FoodCouriersNavigation() {
                 onNavigateToFoodDetail = { foodId ->
                     navController.navigate("detail/$foodId")
                 },
+                onNavigateToMealMenu = {
+                    navController.navigate("meal_menu")
+                },
                 onNavigateToLocation = {
                     navController.navigate("location")
+                },
+                onNavigateToProfile = {
+                    navController.navigate("profile")
+                },
+                onNavigateToCart = {
+                    navController.navigate("cart")
+                },
+                onNavigateToChat = {
+                    navController.navigate("chat")
+                }
+            )
+        }
+
+        composable("meal_menu") {
+            MealMenuScreen(
+                viewModel = homeViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToFoodDetail = { foodId ->
+                    navController.navigate("detail/$foodId")
                 },
                 onNavigateToProfile = {
                     navController.navigate("profile")

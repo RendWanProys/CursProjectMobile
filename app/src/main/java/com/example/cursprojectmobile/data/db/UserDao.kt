@@ -2,6 +2,7 @@ package com.example.cursprojectmobile.data.db
 
 import android.content.ContentValues
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import com.example.cursprojectmobile.data.model.UserProfile
 
 class UserDao(private val dbHelper: DatabaseHelper) {
@@ -32,21 +33,30 @@ class UserDao(private val dbHelper: DatabaseHelper) {
     }
 
     fun updateUserProfile(profile: UserProfile): Boolean {
-        val db = dbHelper.writableDatabase
-        val cv = ContentValues().apply {
-            put(DatabaseHelper.COL_USER_NAME, profile.name)
-            put(DatabaseHelper.COL_USER_EMAIL, profile.email)
-            put(DatabaseHelper.COL_USER_PHONE, profile.phone)
-            put(DatabaseHelper.COL_USER_OCCUPATION, profile.occupation)
-            put(DatabaseHelper.COL_USER_EMPLOYER, profile.employer)
-            put(DatabaseHelper.COL_USER_COUNTRY, profile.country)
-            put(DatabaseHelper.COL_USER_NOTIFICATIONS, if (profile.isNotificationEnabled) 1 else 0)
+        try {
+            val db = dbHelper.writableDatabase
+            val cv = ContentValues().apply {
+                put(DatabaseHelper.COL_USER_NAME, profile.name)
+                put(DatabaseHelper.COL_USER_EMAIL, profile.email)
+                put(DatabaseHelper.COL_USER_PHONE, profile.phone)
+                put(DatabaseHelper.COL_USER_OCCUPATION, profile.occupation)
+                put(DatabaseHelper.COL_USER_EMPLOYER, profile.employer)
+                put(DatabaseHelper.COL_USER_COUNTRY, profile.country)
+                put(DatabaseHelper.COL_USER_NOTIFICATIONS, if (profile.isNotificationEnabled) 1 else 0)
+            }
+            val updated = db.update(
+                DatabaseHelper.TABLE_USER,
+                cv,
+                "${DatabaseHelper.COL_USER_ID} = 1",
+                null
+            )
+            if (updated == 0) {
+                cv.put(DatabaseHelper.COL_USER_ID, 1)
+                db.insertWithOnConflict(DatabaseHelper.TABLE_USER, null, cv, SQLiteDatabase.CONFLICT_REPLACE)
+            }
+            return true
+        } catch (_: Exception) {
+            return false
         }
-        return db.update(
-            DatabaseHelper.TABLE_USER,
-            cv,
-            "${DatabaseHelper.COL_USER_ID} = 1",
-            null
-        ) > 0
     }
 }

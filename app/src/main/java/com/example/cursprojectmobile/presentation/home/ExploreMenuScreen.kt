@@ -1,6 +1,7 @@
 package com.example.cursprojectmobile.presentation.home
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +28,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.data.model.FoodItem
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
+import Rg.CursProjectMobile.R
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
@@ -39,6 +43,7 @@ import com.example.cursprojectmobile.ui.theme.TextGray
 fun ExploreMenuScreen(
     viewModel: HomeViewModel,
     onNavigateToFoodDetail: (Long) -> Unit,
+    onNavigateToMealMenu: () -> Unit = {},
     onNavigateToLocation: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToCart: () -> Unit,
@@ -67,14 +72,28 @@ fun ExploreMenuScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFFAFAFA))
                 .statusBarsPadding()
-                .padding(innerPadding),
-            contentPadding = PaddingValues(bottom = 24.dp)
+                .padding(innerPadding)
         ) {
+            Image(
+                painter = painterResource(id = R.drawable.bg_food_pattern),
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .align(Alignment.TopCenter),
+                contentScale = ContentScale.Crop,
+                alpha = 0.45f
+            )
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
             // 1. Header is part of the scrollable page (not pinned to top)
             item {
                 Row(
@@ -350,7 +369,7 @@ fun ExploreMenuScreen(
                             fontWeight = FontWeight.SemiBold,
                             color = BrandPrimary,
                             modifier = Modifier.clickable {
-                                viewModel.selectCategory("All")
+                                onNavigateToMealMenu()
                             }
                         )
                     }
@@ -368,6 +387,7 @@ fun ExploreMenuScreen(
             }
         }
     }
+}
 }
 
 /**
