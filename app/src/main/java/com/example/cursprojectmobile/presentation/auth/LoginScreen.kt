@@ -228,8 +228,9 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sign in with Google Button
+            val context = androidx.compose.ui.platform.LocalContext.current
             Button(
-                onClick = { viewModel.loginWithGoogle(onSuccess = onLoginSuccess) },
+                onClick = { viewModel.loginWithGoogle(context = context, onSuccess = onLoginSuccess) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

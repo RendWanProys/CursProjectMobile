@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val searchQuery: String = "",
-    val selectedCategory: String = "Burger",
+    val selectedCategory: String = "All",
     val categories: List<Category> = emptyList(),
     val filteredFoods: List<FoodItem> = emptyList(),
     val popularFoods: List<FoodItem> = emptyList(),

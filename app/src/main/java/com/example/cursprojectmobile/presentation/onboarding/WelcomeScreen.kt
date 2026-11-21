@@ -81,44 +81,61 @@ fun WelcomeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                // Fixed height image container so both pages are completely identical
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(0.9f)
-                        .aspectRatio(1f),
+                        .fillMaxWidth()
+                        .height(270.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(id = page.imageRes),
-                        contentDescription = "Onboarding image",
-                        modifier = Modifier.fillMaxSize(),
+                        contentDescription = "Onboarding illustration",
+                        modifier = Modifier.fillMaxHeight(),
                         contentScale = ContentScale.Fit
                     )
                 }
 
-                Spacer(modifier = Modifier.height(36.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                Text(
-                    text = page.title,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextDark,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 32.sp
-                )
+                // Fixed height title box so text never displaces other elements
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(68.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = page.title,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = TextDark,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 32.sp
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
-                Text(
-                    text = page.description,
-                    fontSize = 14.sp,
-                    color = TextGray,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
-                )
+                // Fixed height description box
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = page.description,
+                        fontSize = 14.sp,
+                        color = TextGray,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 20.sp
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                // Center Action Button
+                // Action Button (Next / Get Started)
                 Button(
                     onClick = {
                         if (pagerState.currentPage < pages.size - 1) {
@@ -131,8 +148,8 @@ fun WelcomeScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.65f)
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
+                        .height(50.dp),
+                    shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
                 ) {
                     Text(
@@ -145,13 +162,12 @@ fun WelcomeScreen(
             }
         }
 
-        // Bottom row: Always visible on ALL pages (Page 0 and Page 1)
-        Row(
+        // Bottom row: Exact mathematical centering of dots, Skip on left, action on right
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 28.dp, vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            contentAlignment = Alignment.Center
         ) {
             // Left: Skip
             Text(
@@ -160,12 +176,14 @@ fun WelcomeScreen(
                 color = TextDark,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
+                    .align(Alignment.CenterStart)
                     .clickable { onGetStarted() }
                     .padding(8.dp)
             )
 
-            // Center: Pager Indicator Dots (rendered on both pages!)
+            // Center: Pager Indicator Dots (Strictly centered on ALL pages!)
             Row(
+                modifier = Modifier.align(Alignment.Center),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -186,32 +204,34 @@ fun WelcomeScreen(
             }
 
             // Right: Navigation action
-            if (pagerState.currentPage < pages.size - 1) {
-                // Page 0: Arrow (→)
-                Text(
-                    text = "→",
-                    fontSize = 24.sp,
-                    color = BrandPrimary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .clickable {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+            Box(modifier = Modifier.align(Alignment.CenterEnd)) {
+                if (pagerState.currentPage < pages.size - 1) {
+                    // Page 0: Arrow (→)
+                    Text(
+                        text = "→",
+                        fontSize = 24.sp,
+                        color = BrandPrimary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                }
                             }
-                        }
-                        .padding(8.dp)
-                )
-            } else {
-                // Page 1: Sign In
-                Text(
-                    text = "Sign In",
-                    fontSize = 15.sp,
-                    color = BrandPrimary,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .clickable { onSignIn() }
-                        .padding(8.dp)
-                )
+                            .padding(8.dp)
+                    )
+                } else {
+                    // Page 1: Sign In
+                    Text(
+                        text = "Sign In",
+                        fontSize = 15.sp,
+                        color = BrandPrimary,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clickable { onSignIn() }
+                            .padding(8.dp)
+                    )
+                }
             }
         }
     }

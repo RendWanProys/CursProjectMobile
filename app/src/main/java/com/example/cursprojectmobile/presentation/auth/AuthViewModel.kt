@@ -150,10 +150,10 @@ class AuthViewModel(
     }
 
     // --- Google Sign-In Handler ---
-    fun loginWithGoogle(onSuccess: () -> Unit) {
+    fun loginWithGoogle(context: android.content.Context? = null, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoginLoading = true, isSignUpLoading = true) }
-            val result = repository.loginWithGoogle()
+            val result = repository.loginWithGoogle(context)
             if (result.isSuccess) {
                 val user = result.getOrNull()
                 _uiState.update {

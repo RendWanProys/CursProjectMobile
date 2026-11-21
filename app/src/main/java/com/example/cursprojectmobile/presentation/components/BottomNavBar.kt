@@ -1,5 +1,6 @@
 package com.example.cursprojectmobile.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,11 +13,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.cursprojectmobile.ui.theme.BrandLightPink
 import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.TextGray
+import Rg.CursProjectMobile.R
+
+data class NavTab(
+    val iconRes: Int,
+    val label: String
+)
 
 @Composable
 fun BottomNavBar(
@@ -24,6 +34,13 @@ fun BottomNavBar(
     cartItemCount: Int,
     onTabSelected: (Int) -> Unit
 ) {
+    val tabs = listOf(
+        NavTab(R.drawable.ic_home,   "Home"),
+        NavTab(R.drawable.ic_person, "Profile"),
+        NavTab(R.drawable.ic_cart,   "Cart"),
+        NavTab(R.drawable.ic_chat,   "Chat")
+    )
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,41 +51,22 @@ fun BottomNavBar(
         horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BottomNavItem(
-            icon = "🏠",
-            label = "Home",
-            isSelected = selectedTab == 0,
-            onClick = { onTabSelected(0) }
-        )
-
-        BottomNavItem(
-            icon = "👤",
-            label = "Profile",
-            isSelected = selectedTab == 1,
-            onClick = { onTabSelected(1) }
-        )
-
-        BottomNavItem(
-            icon = "🛒",
-            label = "Cart",
-            isSelected = selectedTab == 2,
-            badgeCount = cartItemCount,
-            onClick = { onTabSelected(2) }
-        )
-
-        BottomNavItem(
-            icon = "💬",
-            label = "Chat",
-            isSelected = selectedTab == 3,
-            hasNotification = true,
-            onClick = { onTabSelected(3) }
-        )
+        tabs.forEachIndexed { index, tab ->
+            BottomNavItem(
+                iconRes = tab.iconRes,
+                label = tab.label,
+                isSelected = selectedTab == index,
+                badgeCount = if (index == 2) cartItemCount else 0,
+                hasNotification = index == 3,
+                onClick = { onTabSelected(index) }
+            )
+        }
     }
 }
 
 @Composable
 private fun BottomNavItem(
-    icon: String,
+    iconRes: Int,
     label: String,
     isSelected: Boolean,
     badgeCount: Int = 0,
@@ -88,7 +86,12 @@ private fun BottomNavItem(
             horizontalArrangement = Arrangement.Center
         ) {
             Box {
-                Text(text = icon, fontSize = 20.sp)
+                Image(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = label,
+                    modifier = Modifier.size(22.dp),
+                    colorFilter = ColorFilter.tint(if (isSelected) BrandPrimary else TextGray)
+                )
 
                 if (badgeCount > 0) {
                     Box(
@@ -109,7 +112,7 @@ private fun BottomNavItem(
                 } else if (hasNotification && isSelected) {
                     Box(
                         modifier = Modifier
-                            .offset(x = 12.dp, y = (-4).dp)
+                            .offset(x = 14.dp, y = (-4).dp)
                             .size(8.dp)
                             .clip(CircleShape)
                             .background(BrandPrimary)

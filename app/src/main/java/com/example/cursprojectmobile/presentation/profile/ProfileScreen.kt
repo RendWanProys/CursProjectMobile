@@ -1,5 +1,6 @@
 package com.example.cursprojectmobile.presentation.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,6 +30,7 @@ import com.example.cursprojectmobile.ui.theme.BrandLightPink
 import com.example.cursprojectmobile.ui.theme.BrandPrimary
 import com.example.cursprojectmobile.ui.theme.TextDark
 import com.example.cursprojectmobile.ui.theme.TextGray
+import Rg.CursProjectMobile.R
 
 @Composable
 fun ProfileScreen(
@@ -267,11 +272,34 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileInfoRow(icon: String, label: String, value: String) {
+    val iconRes = when (icon) {
+        "📱" -> R.drawable.ic_phone
+        "📍" -> R.drawable.ic_location
+        "📦" -> R.drawable.ic_package
+        else -> null
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = icon, fontSize = 20.sp)
+        if (iconRes != null) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFF5F5F5)),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = label,
+                    modifier = Modifier.size(20.dp),
+                    colorFilter = ColorFilter.tint(TextGray)
+                )
+            }
+        } else {
+            Text(text = icon, fontSize = 20.sp)
+        }
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(text = label, fontSize = 12.sp, color = TextGray)

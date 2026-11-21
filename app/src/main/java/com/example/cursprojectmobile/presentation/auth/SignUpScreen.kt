@@ -229,8 +229,9 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Sign Up with Google Button
+            val context = androidx.compose.ui.platform.LocalContext.current
             Button(
-                onClick = { viewModel.loginWithGoogle(onSuccess = onGoogleSignUpSuccess) },
+                onClick = { viewModel.loginWithGoogle(context = context, onSuccess = onGoogleSignUpSuccess) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),

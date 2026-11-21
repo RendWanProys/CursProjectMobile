@@ -1,24 +1,19 @@
 package com.example.cursprojectmobile.presentation.onboarding
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.cursprojectmobile.ui.theme.BrandPrimary
-import com.example.cursprojectmobile.ui.theme.BrandSecondary
-import kotlinx.coroutines.flow.collectLatest
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import Rg.CursProjectMobile.R
+import com.example.cursprojectmobile.data.UserSessionManager
+import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
@@ -26,63 +21,28 @@ fun SplashScreen(
     onNavigateToWelcome: () -> Unit,
     onNavigateToHome: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-
+    // Timer starts only after the splash screen composable is actually rendered on screen
     LaunchedEffect(Unit) {
-        viewModel.navigationEvent.collectLatest { event ->
-            when (event) {
-                is OnboardingNavigationEvent.NavigateToHome -> onNavigateToHome()
-                is OnboardingNavigationEvent.NavigateToWelcome -> onNavigateToWelcome()
-            }
+        delay(3000L)
+        if (UserSessionManager.isLoggedIn()) {
+            onNavigateToHome()
+        } else {
+            onNavigateToWelcome()
         }
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        BrandPrimary,
-                        BrandSecondary
-                    )
-                )
-            ),
+            .background(Color.White),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(110.dp)
-                    .clip(CircleShape)
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "🍔",
-                    fontSize = 54.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = uiState.appName,
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = uiState.splashSubtitle,
-                color = Color.White.copy(alpha = 0.88f),
-                fontSize = 15.sp
-            )
-        }
+        // Fullscreen splash illustration with scooter delivery girl and "Food Couriers" logo
+        Image(
+            painter = painterResource(id = R.drawable.splashscreen),
+            contentDescription = "Food Couriers Splash",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
     }
 }
