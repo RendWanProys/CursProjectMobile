@@ -27,11 +27,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import Rg.CursProjectMobile.R
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.cursprojectmobile.presentation.components.BottomNavBar
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
 import com.example.cursprojectmobile.ui.theme.BrandLightPink
 import com.example.cursprojectmobile.ui.theme.BrandPrimary
+import com.example.cursprojectmobile.ui.theme.Poppins
 import com.example.cursprojectmobile.ui.theme.TextDark
 import com.example.cursprojectmobile.ui.theme.TextGray
 
@@ -299,37 +301,62 @@ fun ProfileScreen(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            shape = RoundedCornerShape(14.dp),
+                                .padding(vertical = 5.dp),
+                            shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(14.dp),
+                                    .padding(horizontal = 16.dp, vertical = 14.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Column {
+                                // Order Icon Badge
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFFFDE8EC)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(text = "🛍️", fontSize = 20.sp)
+                                }
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
                                     val formattedDate = java.text.SimpleDateFormat("dd MMM, HH:mm", java.util.Locale.getDefault()).format(java.util.Date(order.date))
                                     Text(
                                         text = "Order #${order.id} • $formattedDate",
-                                        fontWeight = FontWeight.SemiBold,
+                                        fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp,
+                                        fontFamily = Poppins,
                                         color = TextDark
                                     )
+                                    Spacer(modifier = Modifier.height(2.dp))
                                     Text(
-                                        text = "Status: ${order.status} • Delivery to: ${order.address.take(20)}...",
+                                        text = "Status: ${order.status} • Delivery to: ${order.address}",
                                         fontSize = 12.sp,
-                                        color = TextGray
+                                        fontFamily = Poppins,
+                                        color = TextGray,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
+
+                                Spacer(modifier = Modifier.width(12.dp))
+
                                 Text(
-                                    text = "$${"%.2f".format(order.totalAmount)}",
+                                    text = "$ ${"%.2f".format(order.totalAmount)}",
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 15.sp,
-                                    color = BrandPrimary
+                                    fontSize = 16.sp,
+                                    fontFamily = Poppins,
+                                    color = BrandPrimary,
+                                    maxLines = 1
                                 )
                             }
                         }
