@@ -151,18 +151,9 @@ fun ExploreMenuScreen(
                 }
             }
 
-            // 2. Title and Search Bar
+            // 2. Search Bar directly below Header (matching Figma design)
             item {
-                Column(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
-                    Text(
-                        text = "Delicious food\nReady to deliver",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextDark,
-                        lineHeight = 30.sp
-                    )
-                    Spacer(modifier = Modifier.height(14.dp))
-
+                Box(modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)) {
                     OutlinedTextField(
                         value = uiState.searchQuery,
                         onValueChange = { viewModel.onSearchQueryChange(it) },
@@ -228,54 +219,30 @@ fun ExploreMenuScreen(
                     Spacer(modifier = Modifier.height(10.dp))
                 }
             } else {
-                // 3. Special Offer Banner
+                // 3. Special Offer Banner (Ready-made graphic banner with click to burger detail)
                 item {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    val burgerId = uiState.popularFoods.firstOrNull { it.category == "Burger" }?.id
+                        ?: uiState.filteredFoods.firstOrNull { it.category == "Burger" }?.id
+                        ?: 1L
+
+                    Spacer(modifier = Modifier.height(10.dp))
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 20.dp)
-                            .height(130.dp)
                             .clip(RoundedCornerShape(20.dp))
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color(0xFFD61355),
-                                        Color(0xFFFF5277)
-                                    )
-                                )
-                            )
-                            .padding(20.dp)
+                            .clickable {
+                                onNavigateToFoodDetail(burgerId)
+                            }
                     ) {
-                        Column(modifier = Modifier.fillMaxWidth(0.65f)) {
-                            Text(
-                                text = "Special Deal for Today",
-                                color = Color.White.copy(alpha = 0.9f),
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Medium
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Free Delivery\nOn 1st Order!",
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                lineHeight = 24.sp
-                            )
-                        }
-
-                        Box(
+                        Image(
+                            painter = painterResource(id = R.drawable.food_banner_offer),
+                            contentDescription = "Special Offer for March - Buy Now",
                             modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .size(90.dp)
-                        ) {
-                            FoodImagePlaceholder(
-                                drawableRes = FoodImages.BANNER_OFFER,
-                                emoji = "🎁",
-                                modifier = Modifier.fillMaxSize(),
-                                cornerRadius = 16.dp
-                            )
-                        }
+                                .fillMaxWidth()
+                                .aspectRatio(985f / 450f),
+                            contentScale = ContentScale.FillWidth
+                        )
                     }
                 }
 

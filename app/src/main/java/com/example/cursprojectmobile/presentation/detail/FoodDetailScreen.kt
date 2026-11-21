@@ -13,12 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
+import Rg.CursProjectMobile.R
 import com.example.cursprojectmobile.presentation.components.FoodImagePlaceholder
 import com.example.cursprojectmobile.presentation.components.FoodImages
 import com.example.cursprojectmobile.ui.theme.BrandPrimary
@@ -36,7 +37,6 @@ fun FoodDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val food = uiState.foodItem
-    var isQuantityExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(foodId) {
         viewModel.loadFoodItem(foodId)
@@ -57,11 +57,11 @@ fun FoodDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFFF2F4))
+            .background(Color.White)
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        // Top Bar with Back chevron and Cart button
+        // Top Bar: Back circle button, Title, Cart circle button (matching Image 6)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -72,16 +72,16 @@ fun FoodDetailScreen(
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFFFDE8EC))
+                    .clip(CircleShape)
+                    .background(Color(0xFFF7F8F9))
                     .clickable { onBack() },
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "‹",
-                    fontSize = 28.sp,
+                    text = "\u2190",
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = BrandPrimary
+                    color = TextDark
                 )
             }
 
@@ -96,327 +96,248 @@ fun FoodDetailScreen(
             Box(
                 modifier = Modifier
                     .size(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFFFDE8EC))
+                    .clip(CircleShape)
+                    .background(Color(0xFFF7F8F9))
                     .clickable { onNavigateToCart() },
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "🛒", fontSize = 18.sp)
+                Text(text = "\uD83D\uDED2", fontSize = 18.sp)
             }
         }
 
-        // Hero Food Image in top pink section
-        val imageRes = FoodImages.getDrawableByName(food.imageResName)
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(230.dp)
-                .padding(horizontal = 24.dp, vertical = 8.dp)
-                .clip(RoundedCornerShape(22.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            FoodImagePlaceholder(
-                drawableRes = imageRes,
-                emoji = when (food.category) {
-                    "Pizza" -> "🍕"
-                    "Sandwich" -> "🥪"
-                    else -> "🍔"
-                },
-                cornerRadius = 22.dp,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        // Bottom White Card Sheet with rounded top corners
-        Surface(
+        // Scrollable Content
+        Column(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-            color = Color.White,
-            shadowElevation = 8.dp
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
         ) {
-            Column(
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Food Hero Image with rounded corners matching Image 6
+            val imageRes = FoodImages.getDrawableByName(food.imageResName)
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                    .fillMaxWidth()
+                    .height(240.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentAlignment = Alignment.Center
             ) {
-                // Little handle bar
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .width(44.dp)
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(Color(0xFFEADBDF))
+                FoodImagePlaceholder(
+                    drawableRes = imageRes,
+                    emoji = when (food.category) {
+                        "Pizza" -> "\uD83C\uDF55"
+                        "Sandwich" -> "\uD83E\uDD6A"
+                        else -> "\uD83C\uDF54"
+                    },
+                    cornerRadius = 20.dp,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(18.dp))
+
+            // Title and Price Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = food.title,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
+                    color = TextDark,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = "$${String.format(Locale.US, "%.2f", food.price)}",
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
+                    color = BrandPrimary
+                )
+            }
 
-                // Popular Badge + Pin & Heart Icons
+            // Subtitle
+            if (food.subtitle.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = food.subtitle,
+                    fontSize = 13.sp,
+                    fontFamily = Poppins,
+                    color = TextGray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Stats Pill Row (Rating, Orders, Category) matching Image 6
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFFDE8EC))
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
+                    // Rating
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("\u2B50", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Popular",
-                            color = BrandPrimary,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = Poppins
-                        )
-                    }
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFFDE8EC)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "📍", fontSize = 15.sp)
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFFDE8EC)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "❤️", fontSize = 15.sp)
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Title and Price Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = food.title,
-                            fontSize = 22.sp,
+                            text = "${food.rating} Rating",
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             fontFamily = Poppins,
                             color = TextDark
                         )
-                        if (food.subtitle.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = food.subtitle,
-                                fontSize = 13.sp,
-                                fontFamily = Poppins,
-                                color = TextGray
-                            )
-                        }
                     }
 
-                    Text(
-                        text = "$${"%.2f".format(food.price)}",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Poppins,
-                        color = BrandPrimary
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Rating & Orders row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("⭐", fontSize = 15.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${food.rating} Rating",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = Poppins,
-                        color = TextDark
-                    )
-
-                    Spacer(modifier = Modifier.width(24.dp))
-
-                    Text("🛍️", fontSize = 15.sp)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${food.orderCount}+ Orders",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = Poppins,
-                        color = TextDark
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(18.dp))
-
-                Text(
-                    text = "Description",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = Poppins,
-                    color = TextDark
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = food.description.ifEmpty {
-                        "Prepared fresh to order using premium culinary ingredients, expertly balanced sauces, and handcrafted seasoning for the ultimate dining experience."
-                    },
-                    fontSize = 14.sp,
-                    fontFamily = Poppins,
-                    color = TextGray,
-                    lineHeight = 22.sp
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-        }
-
-        // Bottom Action Bar: Initially a single wide button, expanding into stepper + button
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shadowElevation = 14.dp,
-            color = Color.White
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 14.dp)
-            ) {
-                if (!isQuantityExpanded) {
-                    // 1. Initial State: Single large "Add to Cart • $Price" button
-                    Button(
-                        onClick = {
-                            isQuantityExpanded = true
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
-                    ) {
+                    // Orders
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("\uD83D\uDD25", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "Add to Cart • $${"%.2f".format(food.price)}",
-                            color = Color.White,
-                            fontSize = 16.sp,
+                            text = "${food.orderCount}+ Orders",
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            fontFamily = Poppins
+                            fontFamily = Poppins,
+                            color = TextDark
                         )
                     }
-                } else {
-                    // 2. Expanded State: Stepper [- Qty +] on the left, Add to Cart on the right
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        // Quantity Stepper
-                        Row(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(Color(0xFFF3F3F3))
-                                .padding(horizontal = 8.dp, vertical = 6.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White)
-                                    .clickable {
-                                        if (uiState.quantity > 1) {
-                                            viewModel.decrementQuantity()
-                                        } else {
-                                            isQuantityExpanded = false
-                                        }
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "−",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = TextDark
-                                )
-                            }
 
-                            Spacer(modifier = Modifier.width(14.dp))
-
-                            Text(
-                                text = "${uiState.quantity}",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = Poppins,
-                                color = TextDark
-                            )
-
-                            Spacer(modifier = Modifier.width(14.dp))
-
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(BrandPrimary)
-                                    .clickable { viewModel.incrementQuantity() },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = "+",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                        }
-
-                        // Add to Cart Button with total price
-                        Button(
-                            onClick = {
-                                viewModel.addToCart {
-                                    Toast.makeText(
-                                        context,
-                                        "${food.title} x${uiState.quantity} added to cart!",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                    onNavigateToCart()
-                                }
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(start = 16.dp)
-                                .height(50.dp),
-                            shape = RoundedCornerShape(14.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
-                        ) {
-                            Text(
-                                text = "Add to Cart • $${"%.2f".format(food.price * uiState.quantity)}",
-                                color = Color.White,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = Poppins
-                            )
-                        }
+                    // Category / Icon
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text("\uD83C\uDF7D\uFE0F", fontSize = 14.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = food.category,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins,
+                            color = TextDark
+                        )
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Description Heading
+            Text(
+                text = "Description",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = Poppins,
+                color = TextDark
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Description Body
+            Text(
+                text = food.description.ifEmpty {
+                    "Tender grilled chicken fillet seasoned with fragrant spices, sliced tomatoes, melted gouda and fresh crispy iceberg lettuce."
+                },
+                fontSize = 14.sp,
+                fontFamily = Poppins,
+                color = TextGray,
+                lineHeight = 22.sp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        // Bottom Action Bar: Counter on left, Add to Cart on right (Matching Image 6)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shadowElevation = 8.dp,
+            color = Color.White
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Quantity Stepper Pill [- Qty +]
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFFF5F6F8))
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { viewModel.decrementQuantity() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "–",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = TextDark
+                        )
+                    }
+
+                    Text(
+                        text = "${uiState.quantity}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Poppins,
+                        color = TextDark
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .background(BrandPrimary)
+                            .clickable { viewModel.incrementQuantity() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "+",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                // Wide "Add to Cart • $Price" Button
+                val totalPrice = food.price * uiState.quantity
+                Button(
+                    onClick = {
+                        viewModel.addToCart {
+                            Toast.makeText(context, "${food.title} added to cart", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
+                ) {
+                    Text(
+                        text = "Add to Cart • $${String.format(Locale.US, "%.2f", totalPrice)}",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = Poppins
+                    )
                 }
             }
         }

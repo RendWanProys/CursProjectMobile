@@ -1,6 +1,5 @@
 package com.example.cursprojectmobile.presentation.order
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -50,46 +48,32 @@ fun FinishOrderScreen(
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
-        // Top food doodle background pattern
-        Image(
-            painter = painterResource(id = R.drawable.bg_food_pattern),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp)
-                .align(Alignment.TopCenter),
-            contentScale = ContentScale.Crop,
-            alpha = 0.55f
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
+                .padding(horizontal = 24.dp, vertical = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(30.dp))
 
-            // Checkmark in Pink Circle with decorative dots
+            // 1. Confetti / Party Popper in Mint Circle matching Image 7
             Box(
                 modifier = Modifier
-                    .size(92.dp)
+                    .size(110.dp)
                     .clip(CircleShape)
-                    .background(BrandPrimary)
-                    .shadow(8.dp, CircleShape),
+                    .background(Color(0xFFE8F8F2)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "✓",
-                    fontSize = 44.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
+                    text = "\uD83C\uDF89",
+                    fontSize = 52.sp
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // 2. Title: "Thank You! Order Completed"
             Text(
                 text = "Thank You!\nOrder Completed",
                 fontSize = 24.sp,
@@ -102,17 +86,70 @@ fun FinishOrderScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
+            // 3. Subtitle: "Please rate your driver & food delivery experience"
             Text(
-                text = "Please rate your last Driver",
+                text = "Please rate your driver & food delivery experience",
                 fontSize = 14.sp,
                 fontFamily = Poppins,
                 color = TextGray,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // 5 Solid Gold Stars
+            // 4. Driver Profile Card (Courtney Henry) matching Image 7
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F9FA))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFFFC107)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.user_avatar),
+                            contentDescription = "Driver Avatar",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(14.dp))
+
+                    Column {
+                        Text(
+                            text = "Courtney Henry",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Poppins,
+                            color = TextDark
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Food Delivery Partner • 4.9 \u2605",
+                            fontSize = 13.sp,
+                            fontFamily = Poppins,
+                            color = TextGray
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            // 5. 5 Large Interactive Gold Rating Stars
             Row(
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -120,8 +157,8 @@ fun FinishOrderScreen(
                 for (star in 1..5) {
                     val isSelected = star <= uiState.rating
                     Text(
-                        text = "★",
-                        fontSize = 38.sp,
+                        text = "\u2605",
+                        fontSize = 42.sp,
                         color = if (isSelected) Color(0xFFFFB800) else Color(0xFFFFE0B2),
                         modifier = Modifier
                             .clickable { viewModel.setRating(star) }
@@ -130,87 +167,72 @@ fun FinishOrderScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // Feedback Input Field with Pencil Icon matching mockup
+            // 6. Feedback text input area matching Image 7
             OutlinedTextField(
                 value = uiState.feedback,
                 onValueChange = { viewModel.setFeedback(it) },
                 placeholder = {
                     Text(
-                        text = "Leave feedback",
+                        text = "Leave feedback for driver...",
                         color = Color(0xFF9E9E9E),
                         fontSize = 14.sp,
                         fontFamily = Poppins
                     )
                 },
-                leadingIcon = {
-                    Text(text = "✏️", fontSize = 16.sp)
-                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(100.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = BrandPrimary,
-                    unfocusedBorderColor = Color(0xFFE8E8E8),
+                    focusedBorderColor = Color(0xFF9E9E9E),
+                    unfocusedBorderColor = Color(0xFFE0E0E0),
                     focusedContainerColor = Color.White,
                     unfocusedContainerColor = Color.White
                 ),
-                singleLine = true
+                maxLines = 4
             )
 
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-            // Action Buttons Row: [ Submit (Pink) ] and [ Skip (White with Pink text) ]
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = {
-                        viewModel.submitFeedback {
-                            onNavigateToHome()
-                        }
-                    },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
-                ) {
-                    Text(
-                        text = "Submit",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = Poppins,
-                        color = Color.White
-                    )
-                }
-
-                Surface(
-                    onClick = { onNavigateToHome() },
-                    modifier = Modifier
-                        .width(96.dp)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(14.dp),
-                    color = Color(0xFFFAFAFA),
-                    border = BorderStroke(1.dp, Color(0xFFEEEEEE))
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Skip",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            fontFamily = Poppins,
-                            color = BrandPrimary
-                        )
+            // 7. Full width "Submit & Return Home" pink button
+            Button(
+                onClick = {
+                    viewModel.submitFeedback {
+                        onNavigateToHome()
                     }
-                }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(52.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary)
+            ) {
+                Text(
+                    text = "Submit & Return Home",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Poppins,
+                    color = Color.White
+                )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 8. Skip link
+            Text(
+                text = "Skip",
+                fontSize = 15.sp,
+                fontFamily = Poppins,
+                fontWeight = FontWeight.SemiBold,
+                color = TextGray,
+                modifier = Modifier
+                    .clickable { onNavigateToHome() }
+                    .padding(8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

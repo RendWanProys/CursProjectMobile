@@ -106,8 +106,8 @@ fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "‹",
-                            fontSize = 28.sp,
+                            text = "\u2190",
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             color = BrandPrimary
                         )
