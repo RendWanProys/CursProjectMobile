@@ -40,7 +40,8 @@ fun MealMenuScreen(
     onNavigateToFoodDetail: (Long) -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToCart: () -> Unit,
-    onNavigateToChat: () -> Unit
+    onNavigateToChat: () -> Unit,
+    onNavigateToNotifications: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
@@ -135,7 +136,8 @@ fun MealMenuScreen(
                         modifier = Modifier
                             .size(44.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(Color(0xFFFDE8EC)),
+                            .background(Color(0xFFFDE8EC))
+                            .clickable { onNavigateToNotifications() },
                         contentAlignment = Alignment.Center
                     ) {
                         Text(

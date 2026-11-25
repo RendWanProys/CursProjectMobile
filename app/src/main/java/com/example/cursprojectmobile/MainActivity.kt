@@ -24,6 +24,7 @@ import com.example.cursprojectmobile.presentation.home.MealMenuScreen
 import com.example.cursprojectmobile.presentation.home.HomeViewModel
 import com.example.cursprojectmobile.presentation.location.LocationViewModel
 import com.example.cursprojectmobile.presentation.location.SetLocationScreen
+import com.example.cursprojectmobile.presentation.notifications.NotificationsScreen
 import com.example.cursprojectmobile.presentation.onboarding.OnboardingViewModel
 import com.example.cursprojectmobile.presentation.onboarding.SplashScreen
 import com.example.cursprojectmobile.presentation.onboarding.WelcomeScreen
@@ -168,6 +169,9 @@ fun FoodCouriersNavigation() {
                 },
                 onNavigateToChat = {
                     navController.navigate("chat")
+                },
+                onNavigateToNotifications = {
+                    navController.navigate("notifications")
                 }
             )
         }
@@ -221,6 +225,16 @@ fun FoodCouriersNavigation() {
                 onLocationSet = { address ->
                     authViewModel.updateAddress(address)
                     homeViewModel.refreshSessionAddress()
+                },
+                onNavigateToNotifications = {
+                    navController.navigate("notifications")
+                }
+            )
+        }
+
+        composable("notifications") {
+            NotificationsScreen(
+                onBack = {
                     navController.popBackStack()
                 }
             )
